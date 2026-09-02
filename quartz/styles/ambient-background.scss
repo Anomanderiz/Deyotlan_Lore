@@ -1,21 +1,28 @@
 /*
  * Moving ambient field behind the glass.
- * The motion lives on the page background, never on the panes themselves,
- * so the SVG backdrop refraction has visible geometry to bend.
+ *
+ * One continuous, viewport-sized stripe field is shared by the page and the
+ * refracted glass copies. --line-shift is animated on body and inherited by
+ * every pane, keeping the outside and inside geometry phase-locked.
  */
 
-@keyframes deyotlan-line-drift {
+@property --line-shift {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: -110px;
+}
+
+@keyframes deyotlan-line-phase {
   from {
-    background-position: 0 0, 0 0;
+    --line-shift: -110px;
   }
   to {
-    background-position: 128px 0, -64px 0;
+    --line-shift: 110px;
   }
 }
 
 @keyframes deyotlan-ambient-drift {
-  0%,
-  100% {
+  0%, 100% {
     transform: translate3d(-2.5%, -1.5%, 0) scale(1.03);
   }
   50% {
@@ -24,13 +31,8 @@
 }
 
 @keyframes deyotlan-ambient-breathe {
-  0%,
-  100% {
-    opacity: 0.76;
-  }
-  50% {
-    opacity: 0.94;
-  }
+  0%, 100% { opacity: 0.76; }
+  50% { opacity: 0.94; }
 }
 
 body {
@@ -39,8 +41,9 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
 
-  /* A broad, soft colour field. Fey pages inherit their purple/green palette
-   * automatically through --accent-primary / --accent-secondary. */
+  /* Animate the shared stripe phase once, then let descendants inherit it. */
+  animation: deyotlan-line-phase 38s linear infinite alternate;
+
   background-color: var(--surface-base) !important;
   background-image:
     radial-gradient(
@@ -62,40 +65,42 @@ body {
   background-attachment: fixed;
 }
 
-/* Fine diagonal geometry. This is deliberately simple: it exists to reveal
- * refraction when it passes beneath a pane, not to become the visual subject. */
+/*
+ * Continuous diagonal geometry.
+ *
+ * There is deliberately NO tiled background-size here. The old square tiling
+ * cut a diagonal gradient at tile boundaries, which is what made the lines
+ * appear broken. A repeating-linear-gradient already repeats internally and
+ * therefore gives us infinitely long, unbroken stripes by itself.
+ */
 body::before {
   content: "" !important;
+  display: block !important;
   position: fixed !important;
-  inset: -12% !important;
+  inset: -18% !important;
   z-index: 0 !important;
   pointer-events: none !important;
 
-  background-image:
-    repeating-linear-gradient(
-      116deg,
-      color-mix(in srgb, var(--accent-secondary) 20%, rgba(255, 255, 255, 0.12)) 0 1px,
-      transparent 1px 34px
-    ),
-    repeating-linear-gradient(
-      116deg,
-      transparent 0 68px,
-      color-mix(in srgb, var(--accent-primary) 13%, rgba(255, 255, 255, 0.08)) 68px 69px,
-      transparent 69px 136px
-    ) !important;
-  background-size: 136px 136px, 272px 272px !important;
+  background-image: repeating-linear-gradient(
+    116deg,
+    color-mix(in srgb, var(--accent-secondary) 22%, rgba(255, 255, 255, 0.14)) 0 1px,
+    transparent 1px 38px
+  ) !important;
+  background-position: var(--line-shift) 0 !important;
+  background-repeat: no-repeat !important;
+  background-size: 180vw 180vh !important;
+  background-attachment: fixed !important;
 
-  opacity: 0.32 !important;
+  opacity: 0.34 !important;
   filter: none !important;
   mix-blend-mode: screen;
   will-change: background-position;
-  animation: deyotlan-line-drift 34s linear infinite !important;
 }
 
-/* Large blurred colour masses move independently beneath the line field.
- * Their very slow motion produces subtle changing highlights through the glass. */
+/* Large blurred colour masses move independently behind the line field. */
 body::after {
   content: "" !important;
+  display: block !important;
   position: fixed !important;
   inset: -18% !important;
   z-index: 0 !important;
@@ -114,7 +119,6 @@ body::after {
       color-mix(in srgb, var(--accent-secondary) 10%, transparent) 24%,
       transparent 54%
     ) !important;
-  background-size: cover !important;
 
   opacity: 0.84 !important;
   filter: blur(68px) saturate(112%) !important;
@@ -125,23 +129,29 @@ body::after {
     deyotlan-ambient-breathe 19s ease-in-out infinite !important;
 }
 
-/* Keep all Quartz content above the moving optical field. */
 .page {
   position: relative;
   z-index: 1;
+  background: transparent !important;
 }
 
-/* Slightly gentler geometry in light mode so it does not become ruled paper. */
+#quartz-body,
+#quartz-body > .center,
+#quartz-body > .sidebar {
+  background: transparent !important;
+}
+
 html[saved-theme="light"] body::before {
   opacity: 0.20 !important;
   mix-blend-mode: multiply;
 }
 
-/* Fey pages are intended to feel softer and more organic than Deyotlan. */
+html:has(a.tag-link[href*="tags/fey"]) body {
+  animation-duration: 46s;
+}
+
 html:has(a.tag-link[href*="tags/fey"]) body::before {
-  opacity: 0.24 !important;
-  background-size: 152px 152px, 304px 304px !important;
-  animation-duration: 42s !important;
+  opacity: 0.25 !important;
 }
 
 html:has(a.tag-link[href*="tags/fey"]) body::after {
@@ -150,10 +160,7 @@ html:has(a.tag-link[href*="tags/fey"]) body::after {
 }
 
 @media all and (max-width: 800px) {
-  body::before {
-    opacity: 0.24 !important;
-  }
-
+  body::before { opacity: 0.25 !important; }
   body::after {
     opacity: 0.72 !important;
     filter: blur(56px) saturate(110%) !important;
@@ -161,7 +168,7 @@ html:has(a.tag-link[href*="tags/fey"]) body::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body::before,
+  body,
   body::after {
     animation: none !important;
   }
