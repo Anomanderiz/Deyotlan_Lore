@@ -1,10 +1,9 @@
 /*
  * Glass optics.
  *
- * SVG backdrop displacement is deliberately paused for now. It was not visibly
- * refracting the live backdrop in the target browser and forced a costly paint
- * path while the background was moving. These panes therefore use ordinary,
- * hardware-accelerated backdrop blur/saturation only.
+ * Vercel experiment: re-enable the hidden SVG turbulence + displacement filter
+ * on the three major panes only. Smaller UI glass stays on ordinary blur so we
+ * can judge the optical effect without making the whole interface expensive.
  */
 
 .deyotlan-glass-filter-defs {
@@ -15,21 +14,37 @@
   pointer-events: none;
 }
 
-/* Major panes */
+/* Major panes: live SVG displacement + blur/saturation. */
 .page-header,
 .page > #quartz-body > .sidebar.left,
-.page > #quartz-body > .sidebar.right > *,
+.page > #quartz-body > .sidebar.right > * {
+  -webkit-backdrop-filter: blur(7px) saturate(168%) contrast(103%) !important;
+  backdrop-filter:
+    url("#deyotlan-glass-refraction")
+    blur(7px)
+    saturate(168%)
+    contrast(103%) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.055),
+    0 18px 52px -24px var(--glass-shadow) !important;
+
+  background-color: color-mix(in srgb, var(--glass-fill) 46%, transparent) !important;
+}
+
+/* The global graph modal is still glass, but does not participate in the
+ * displacement experiment yet. */
 .graph > .global-graph-outer > .global-graph-container {
   -webkit-backdrop-filter: blur(7px) saturate(168%) contrast(103%) !important;
   backdrop-filter: blur(7px) saturate(168%) contrast(103%) !important;
-
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.34),
     inset 0 0 0 1px rgba(255, 255, 255, 0.055),
     0 18px 52px -24px var(--glass-shadow) !important;
 }
 
-/* Smaller embedded glass */
+/* Smaller embedded glass: normal accelerated backdrop filtering. */
 .properties,
 .note-properties,
 .table-container,
@@ -56,8 +71,11 @@ button.search-button,
     inset 0 0 48px rgba(0, 0, 0, 0.10) !important;
 }
 
-.page-header,
-.page > #quartz-body > .sidebar.left,
-.page > #quartz-body > .sidebar.right > * {
-  background-color: color-mix(in srgb, var(--glass-fill) 46%, transparent) !important;
+/* If URL filters are rejected by the browser, retain clean frosted glass. */
+@supports not (backdrop-filter: url("#deyotlan-glass-refraction") blur(1px)) {
+  .page-header,
+  .page > #quartz-body > .sidebar.left,
+  .page > #quartz-body > .sidebar.right > * {
+    backdrop-filter: blur(7px) saturate(168%) contrast(103%) !important;
+  }
 }
