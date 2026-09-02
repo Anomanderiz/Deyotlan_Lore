@@ -1,11 +1,12 @@
 /*
  * Glass optics.
  *
- * backdrop-filter supplies real blur/saturation of the live page behind each
- * pane. The visible refraction cue is a viewport-aligned copy of the moving
- * stripe field, displaced with an ordinary SVG filter:url(...). This avoids
- * depending on reference filters inside backdrop-filter, whose implementation
- * remains inconsistent between engines.
+ * Chromium/Edge: the unprefixed backdrop-filter references the inline SVG
+ * feTurbulence -> feDisplacementMap filter, so the ACTUAL pixels behind each
+ * pane are displaced before blur/saturation are applied.
+ *
+ * Safari/WebKit fallback: -webkit-backdrop-filter keeps ordinary frosted glass
+ * when SVG reference filters are unavailable in the backdrop path.
  */
 
 .deyotlan-glass-filter-defs {
@@ -17,15 +18,24 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* Real frosted backdrop                                                       */
+/* Major panes: true live backdrop refraction                                  */
 /* -------------------------------------------------------------------------- */
 
 .page-header,
 .page > #quartz-body > .sidebar.left,
 .page > #quartz-body > .sidebar.right > *,
 .graph > .global-graph-outer > .global-graph-container {
+  /* Conservative fallback first. */
   -webkit-backdrop-filter: blur(7px) saturate(168%) contrast(103%) !important;
-  backdrop-filter: blur(7px) saturate(168%) contrast(103%) !important;
+
+  /* Chromium/Edge reference-filter path. SourceGraphic inside the SVG filter
+   * is the captured backdrop, so the moving lines distorted here are the same
+   * lines visible outside the pane rather than a duplicated approximation. */
+  backdrop-filter:
+    url("#deyotlan-glass-refraction")
+    blur(7px)
+    saturate(168%)
+    contrast(103%) !important;
 
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.34),
@@ -33,65 +43,11 @@
     0 18px 52px -24px var(--glass-shadow) !important;
 }
 
-/* -------------------------------------------------------------------------- */
-/* Refracted copy of the continuous background stripe field                   */
-/* -------------------------------------------------------------------------- */
-
-.page-header::before,
-.page > #quartz-body > .sidebar.left::before,
-.page > #quartz-body > .sidebar.right > *::before,
-.graph > .global-graph-outer > .global-graph-container::before {
-  content: "" !important;
-  display: block !important;
-  position: absolute !important;
-  inset: 0 !important;
-  z-index: -1 !important;
-  pointer-events: none !important;
-  border-radius: inherit !important;
-
-  /* Same line geometry and inherited phase as body::before. With fixed
-   * attachment, the pattern is anchored to viewport coordinates rather than
-   * restarting in every card. */
-  background-image: repeating-linear-gradient(
-    116deg,
-    color-mix(in srgb, var(--accent-secondary) 31%, rgba(255, 255, 255, 0.18)) 0 1.25px,
-    transparent 1.25px 38px
-  ) !important;
-  background-position: var(--line-shift) 0 !important;
-  background-repeat: no-repeat !important;
-  background-size: 180vw 180vh !important;
-  background-attachment: fixed !important;
-
-  /* This is the actual feTurbulence -> feDisplacementMap path. It operates on
-   * the stripe copy itself, so Chromium/WebKit/Firefox do not need to support
-   * SVG reference filters inside backdrop-filter. */
-  filter: url("#deyotlan-glass-refraction") blur(0.35px) saturate(118%) !important;
-  opacity: 0.66 !important;
-  mix-blend-mode: screen;
-
-  /* Keep displaced pixels inside the rounded pane while allowing ::after to
-   * remain outside as the animated conic rim. */
-  clip-path: inset(0 round 20px);
-}
-
-/* The left rail and page header have slightly larger radii. */
-.page-header::before {
-  clip-path: inset(0 round 22px);
-}
-
-.page > #quartz-body > .sidebar.left::before {
-  clip-path: inset(0 round 24px);
-}
-
-/* Fey glass has gentler, more organic refraction. */
-html:has(a.tag-link[href*="tags/fey"]) .page-header::before,
-html:has(a.tag-link[href*="tags/fey"]) .page > #quartz-body > .sidebar.left::before,
-html:has(a.tag-link[href*="tags/fey"]) .page > #quartz-body > .sidebar.right > *::before {
-  opacity: 0.56 !important;
-}
+/* IMPORTANT: no ::before line-copy layer exists here. Anything visibly bent
+ * inside these panes must therefore come from the real backdrop itself. */
 
 /* -------------------------------------------------------------------------- */
-/* Smaller glass                                                               */
+/* Smaller embedded glass                                                     */
 /* -------------------------------------------------------------------------- */
 
 .properties,
@@ -103,7 +59,10 @@ button.search-button,
 .darkmode,
 .readermode {
   -webkit-backdrop-filter: blur(5px) saturate(158%) !important;
-  backdrop-filter: blur(5px) saturate(158%) !important;
+  backdrop-filter:
+    url("#deyotlan-glass-refraction")
+    blur(5px)
+    saturate(158%) !important;
 
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.27),
@@ -113,25 +72,39 @@ button.search-button,
 
 .graph > .graph-outer {
   -webkit-backdrop-filter: blur(4px) saturate(150%) !important;
-  backdrop-filter: blur(4px) saturate(150%) !important;
+  backdrop-filter:
+    url("#deyotlan-glass-refraction")
+    blur(4px)
+    saturate(150%) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.22),
     inset 0 0 0 1px rgba(255, 255, 255, 0.035),
     inset 0 0 48px rgba(0, 0, 0, 0.10) !important;
 }
 
-/* Keep the pane tint translucent enough for both the real backdrop and the
- * displaced stripe copy to remain legible. */
+/* Keep tint low enough that bent background geometry remains easy to see. */
 .page-header,
 .page > #quartz-body > .sidebar.left,
 .page > #quartz-body > .sidebar.right > * {
-  background-color: color-mix(in srgb, var(--glass-fill) 54%, transparent) !important;
+  background-color: color-mix(in srgb, var(--glass-fill) 46%, transparent) !important;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .page-header::before,
-  .page > #quartz-body > .sidebar.left::before,
-  .page > #quartz-body > .sidebar.right > *::before {
-    background-position: -110px 0 !important;
+/* If an engine rejects the reference-filter declaration, the earlier
+ * -webkit-backdrop-filter still provides ordinary glass rather than failure. */
+@supports not (backdrop-filter: url("#deyotlan-glass-refraction") blur(1px)) {
+  .page-header,
+  .page > #quartz-body > .sidebar.left,
+  .page > #quartz-body > .sidebar.right > *,
+  .graph > .global-graph-outer > .global-graph-container,
+  .properties,
+  .note-properties,
+  .table-container,
+  pre,
+  .search > .search-button,
+  button.search-button,
+  .darkmode,
+  .readermode,
+  .graph > .graph-outer {
+    backdrop-filter: blur(7px) saturate(165%) contrast(102%) !important;
   }
 }
