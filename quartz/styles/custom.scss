@@ -3,3 +3,10 @@
 @use "./glass-refraction.scss";
 @use "./glass-polish.scss";
 @use "./ambient-background.scss";
+
+/* Ambient layers must remain renderable even if an older theme rule targets
+ * body pseudo-elements. Their content/background is owned by ambient-background. */
+body::before,
+body::after {
+  display: block !important;
+}
