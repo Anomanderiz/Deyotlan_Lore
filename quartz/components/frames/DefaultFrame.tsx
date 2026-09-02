@@ -24,11 +24,9 @@ export const DefaultFrame: PageFrame = {
     return (
       <>
         {/*
-         * Hidden SVG reference filter for live glass refraction.
-         * In Chromium/Edge it is referenced directly from backdrop-filter,
-         * making SourceGraphic the captured backdrop behind the pane.
-         * One low-frequency octave gives broad, smooth optical warping rather
-         * than a noisy/textured surface.
+         * Hidden SVG reference filter for the live-glass diagnostic.
+         * Deliberately exaggerated: if Chromium applies the SVG URL filter to
+         * backdrop-filter, moving background lines should kink dramatically.
          */}
         <svg
           class="deyotlan-glass-filter-defs"
@@ -40,16 +38,16 @@ export const DefaultFrame: PageFrame = {
           <defs>
             <filter
               id="deyotlan-glass-refraction"
-              x="-24%"
-              y="-24%"
-              width="148%"
-              height="148%"
+              x="-40%"
+              y="-40%"
+              width="180%"
+              height="180%"
               color-interpolation-filters="sRGB"
             >
               <feTurbulence
                 type="fractalNoise"
-                baseFrequency="0.006 0.018"
-                numOctaves="1"
+                baseFrequency="0.012 0.032"
+                numOctaves="2"
                 seed="11"
                 stitchTiles="stitch"
                 result="glassNoise"
@@ -57,7 +55,7 @@ export const DefaultFrame: PageFrame = {
               <feDisplacementMap
                 in="SourceGraphic"
                 in2="glassNoise"
-                scale="20"
+                scale="100"
                 xChannelSelector="R"
                 yChannelSelector="G"
               />
