@@ -1,0 +1,97 @@
+/*
+ * Live glass refraction layer.
+ * Applied after deyotlan-glass.scss so the optical model can be tuned
+ * independently from the broader visual system.
+ */
+
+.deyotlan-glass-filter-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Major glass surfaces */
+.page-header,
+.page > #quartz-body > .sidebar.left,
+.page > #quartz-body > .sidebar.right > *,
+.graph > .global-graph-outer > .global-graph-container {
+  /* Safari/WebKit fallback first. */
+  -webkit-backdrop-filter: blur(14px) saturate(180%) contrast(104%) !important;
+
+  /* Browsers supporting URL filters in backdrop-filter get true live refraction. */
+  backdrop-filter:
+    url("#deyotlan-glass-refraction")
+    blur(14px)
+    saturate(180%)
+    contrast(104%) !important;
+
+  /* Crisp lifted rim: bright top edge, much subtler remaining perimeter. */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.055),
+    0 18px 52px -24px var(--glass-shadow) !important;
+}
+
+/* Smaller embedded glass objects need gentler distortion. */
+.properties,
+.note-properties,
+.table-container,
+pre,
+.search > .search-button,
+button.search-button,
+.darkmode,
+.readermode {
+  -webkit-backdrop-filter: blur(10px) saturate(165%) !important;
+  backdrop-filter:
+    url("#deyotlan-glass-refraction")
+    blur(10px)
+    saturate(165%) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.27),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.045),
+    0 12px 32px -26px var(--glass-shadow) !important;
+}
+
+/* The graph viewport is visually glass, but distortion must stay restrained so
+ * node positions remain easy to read. */
+.graph > .graph-outer {
+  -webkit-backdrop-filter: blur(8px) saturate(155%) !important;
+  backdrop-filter:
+    url("#deyotlan-glass-refraction")
+    blur(8px)
+    saturate(155%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+    inset 0 0 48px rgba(0, 0, 0, 0.10) !important;
+}
+
+/* Keep the tint translucent enough that displacement is actually visible. */
+.page-header,
+.page > #quartz-body > .sidebar.left,
+.page > #quartz-body > .sidebar.right > * {
+  background-color: color-mix(in srgb, var(--glass-fill) 58%, transparent) !important;
+}
+
+/* On unsupported engines, the first -webkit-backdrop-filter remains a clean
+ * frosted-glass fallback instead of losing the effect entirely. */
+@supports not (backdrop-filter: url("#deyotlan-glass-refraction") blur(1px)) {
+  .page-header,
+  .page > #quartz-body > .sidebar.left,
+  .page > #quartz-body > .sidebar.right > *,
+  .graph > .global-graph-outer > .global-graph-container,
+  .properties,
+  .note-properties,
+  .table-container,
+  pre,
+  .search > .search-button,
+  button.search-button,
+  .darkmode,
+  .readermode,
+  .graph > .graph-outer {
+    backdrop-filter: blur(14px) saturate(175%) contrast(103%) !important;
+  }
+}
