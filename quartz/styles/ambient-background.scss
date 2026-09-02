@@ -1,21 +1,18 @@
 /*
  * Moving ambient field behind the glass.
  *
- * The stripe sheet moves in ONE direction via compositor-friendly transform.
- * The end transform advances the pattern by exactly one 48px stripe period,
- * so the loop reset is visually identical to the starting frame.
+ * The stripe field is viewport-anchored and animated by background-position.
+ * Major glass panes render the same field internally, using the same timing,
+ * so a stripe reaches the pane boundary at the same place before being
+ * optically displaced inside the pane.
  */
 
-/*
- * For a 135deg gradient, equal X/Y motion of 33.941125px advances the pattern
- * 48px along its gradient axis: sqrt(33.941125^2 + 33.941125^2) = 48px.
- */
 @keyframes deyotlan-line-scroll {
   from {
-    transform: translate3d(0, 0, 0);
+    background-position: 0 0;
   }
   to {
-    transform: translate3d(33.941125px, 33.941125px, 0);
+    background-position: 33.941125px 33.941125px;
   }
 }
 
@@ -61,16 +58,15 @@ body {
 }
 
 /*
- * One continuous stripe sheet. The pseudo-element is deliberately oversized
- * so its small transform never exposes an edge. We animate transform instead
- * of background-position to keep the motion on the compositor and avoid the
- * repaint hitching seen in the previous version.
+ * One viewport-locked stripe sheet. This uses the same 48px-period motion as
+ * the refracted copies inside the panes. A 33.941125px X/Y shift advances a
+ * 135deg field by exactly one 48px stripe period, making the loop seamless.
  */
 body::before {
   content: "" !important;
   display: block !important;
   position: fixed !important;
-  inset: -24% !important;
+  inset: 0 !important;
   z-index: 0 !important;
   pointer-events: none !important;
 
@@ -79,13 +75,14 @@ body::before {
     color-mix(in srgb, var(--accent-secondary) 22%, rgba(255, 255, 255, 0.14)) 0 1px,
     transparent 1px 48px
   ) !important;
+  background-attachment: fixed !important;
+  background-position: 0 0;
 
   opacity: 0.34 !important;
   filter: none !important;
   mix-blend-mode: screen;
-  transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
-  will-change: transform;
+  will-change: background-position;
   animation: deyotlan-line-scroll 14s linear infinite !important;
 }
 
