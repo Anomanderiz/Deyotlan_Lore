@@ -1,12 +1,10 @@
 /*
  * Glass optics.
  *
- * Chromium/Edge: the unprefixed backdrop-filter references the inline SVG
- * feTurbulence -> feDisplacementMap filter, so the ACTUAL pixels behind each
- * pane are displaced before blur/saturation are applied.
- *
- * Safari/WebKit fallback: -webkit-backdrop-filter keeps ordinary frosted glass
- * when SVG reference filters are unavailable in the backdrop path.
+ * SVG backdrop displacement is deliberately paused for now. It was not visibly
+ * refracting the live backdrop in the target browser and forced a costly paint
+ * path while the background was moving. These panes therefore use ordinary,
+ * hardware-accelerated backdrop blur/saturation only.
  */
 
 .deyotlan-glass-filter-defs {
@@ -17,25 +15,13 @@
   pointer-events: none;
 }
 
-/* -------------------------------------------------------------------------- */
-/* Major panes: true live backdrop refraction                                  */
-/* -------------------------------------------------------------------------- */
-
+/* Major panes */
 .page-header,
 .page > #quartz-body > .sidebar.left,
 .page > #quartz-body > .sidebar.right > *,
 .graph > .global-graph-outer > .global-graph-container {
-  /* Conservative fallback first. */
   -webkit-backdrop-filter: blur(7px) saturate(168%) contrast(103%) !important;
-
-  /* Chromium/Edge reference-filter path. SourceGraphic inside the SVG filter
-   * is the captured backdrop, so the moving lines distorted here are the same
-   * lines visible outside the pane rather than a duplicated approximation. */
-  backdrop-filter:
-    url("#deyotlan-glass-refraction")
-    blur(7px)
-    saturate(168%)
-    contrast(103%) !important;
+  backdrop-filter: blur(7px) saturate(168%) contrast(103%) !important;
 
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.34),
@@ -43,13 +29,7 @@
     0 18px 52px -24px var(--glass-shadow) !important;
 }
 
-/* IMPORTANT: no ::before line-copy layer exists here. Anything visibly bent
- * inside these panes must therefore come from the real backdrop itself. */
-
-/* -------------------------------------------------------------------------- */
-/* Smaller embedded glass                                                     */
-/* -------------------------------------------------------------------------- */
-
+/* Smaller embedded glass */
 .properties,
 .note-properties,
 .table-container,
@@ -59,10 +39,7 @@ button.search-button,
 .darkmode,
 .readermode {
   -webkit-backdrop-filter: blur(5px) saturate(158%) !important;
-  backdrop-filter:
-    url("#deyotlan-glass-refraction")
-    blur(5px)
-    saturate(158%) !important;
+  backdrop-filter: blur(5px) saturate(158%) !important;
 
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.27),
@@ -72,39 +49,15 @@ button.search-button,
 
 .graph > .graph-outer {
   -webkit-backdrop-filter: blur(4px) saturate(150%) !important;
-  backdrop-filter:
-    url("#deyotlan-glass-refraction")
-    blur(4px)
-    saturate(150%) !important;
+  backdrop-filter: blur(4px) saturate(150%) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.22),
     inset 0 0 0 1px rgba(255, 255, 255, 0.035),
     inset 0 0 48px rgba(0, 0, 0, 0.10) !important;
 }
 
-/* Keep tint low enough that bent background geometry remains easy to see. */
 .page-header,
 .page > #quartz-body > .sidebar.left,
 .page > #quartz-body > .sidebar.right > * {
   background-color: color-mix(in srgb, var(--glass-fill) 46%, transparent) !important;
-}
-
-/* If an engine rejects the reference-filter declaration, the earlier
- * -webkit-backdrop-filter still provides ordinary glass rather than failure. */
-@supports not (backdrop-filter: url("#deyotlan-glass-refraction") blur(1px)) {
-  .page-header,
-  .page > #quartz-body > .sidebar.left,
-  .page > #quartz-body > .sidebar.right > *,
-  .graph > .global-graph-outer > .global-graph-container,
-  .properties,
-  .note-properties,
-  .table-container,
-  pre,
-  .search > .search-button,
-  button.search-button,
-  .darkmode,
-  .readermode,
-  .graph > .graph-outer {
-    backdrop-filter: blur(7px) saturate(165%) contrast(102%) !important;
-  }
 }
