@@ -24,10 +24,11 @@ export const DefaultFrame: PageFrame = {
     return (
       <>
         {/*
-         * Hidden SVG filter used by the refracted stripe copies inside glass.
-         * Ordinary CSS filter:url(...) is considerably more dependable than
-         * reference filters inside backdrop-filter, while preserving the same
-         * feTurbulence -> feDisplacementMap optical geometry.
+         * Hidden SVG reference filter for live glass refraction.
+         * In Chromium/Edge it is referenced directly from backdrop-filter,
+         * making SourceGraphic the captured backdrop behind the pane.
+         * One low-frequency octave gives broad, smooth optical warping rather
+         * than a noisy/textured surface.
          */}
         <svg
           class="deyotlan-glass-filter-defs"
@@ -47,8 +48,8 @@ export const DefaultFrame: PageFrame = {
             >
               <feTurbulence
                 type="fractalNoise"
-                baseFrequency="0.010 0.024"
-                numOctaves="2"
+                baseFrequency="0.006 0.018"
+                numOctaves="1"
                 seed="11"
                 stitchTiles="stitch"
                 result="glassNoise"
@@ -56,7 +57,7 @@ export const DefaultFrame: PageFrame = {
               <feDisplacementMap
                 in="SourceGraphic"
                 in2="glassNoise"
-                scale="22"
+                scale="20"
                 xChannelSelector="R"
                 yChannelSelector="G"
               />
