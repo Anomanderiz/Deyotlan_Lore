@@ -7,12 +7,11 @@
  *    pane. The pane itself remains smooth and translucent.
  */
 
-/* Remove every intentionally painted noise layer from the visual system. */
-body::after {
-  content: none !important;
-  display: none !important;
-  background: none !important;
-}
+/*
+ * Do NOT touch body::before/body::after here. Those pseudo-elements now belong
+ * to the ambient background system. The old body::after cleanup rule used
+ * display:none!important and silently hid the animated colour field.
+ */
 
 .graph > .graph-outer::before {
   content: none !important;
