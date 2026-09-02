@@ -1,0 +1,143 @@
+/*
+ * Optical polish pass.
+ *
+ * 1. No painted grain on the glass: turbulence exists only as the hidden
+ *    displacement field used by backdrop-filter.
+ * 2. The animated conic gradient lives on a masked pseudo-element BEHIND the
+ *    pane. The pane itself remains smooth and translucent.
+ */
+
+/* Remove every intentionally painted noise layer from the visual system. */
+body::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}
+
+.graph > .graph-outer::before {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}
+
+/* Major glass panes/cards. */
+.page-header,
+.page > #quartz-body > .sidebar.left,
+.page > #quartz-body > .sidebar.right > *,
+.graph > .global-graph-outer > .global-graph-container {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+
+  /* The pane itself is deliberately smooth: tint + slight specular wash only. */
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.045) 0%,
+      transparent 26%,
+      transparent 72%,
+      color-mix(in srgb, var(--accent-primary) 4%, transparent) 100%
+    ),
+    color-mix(in srgb, var(--glass-fill) 58%, transparent) !important;
+  background-clip: padding-box !important;
+  border: 1px solid transparent !important;
+
+  /* The custom angle belongs to the rim pseudo-element, not the glass pane. */
+  animation: none !important;
+}
+
+/*
+ * Rotating conic rim.
+ * The mask punches out the middle, leaving only a 1px ring behind the pane.
+ * @property --glass-angle is registered in deyotlan-glass.scss, so the browser
+ * can interpolate it cleanly from 0deg to 360deg.
+ */
+.page-header::after,
+.page > #quartz-body > .sidebar.left::after,
+.page > #quartz-body > .sidebar.right > *::after,
+.graph > .global-graph-outer > .global-graph-container::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: -1px !important;
+  z-index: -1 !important;
+  border-radius: inherit !important;
+  padding: 1px !important;
+  pointer-events: none !important;
+
+  background: conic-gradient(
+    from var(--glass-angle),
+    transparent 0deg,
+    color-mix(in srgb, var(--accent-primary) 84%, transparent) 48deg,
+    color-mix(in srgb, var(--accent-secondary) 94%, white 6%) 104deg,
+    transparent 164deg,
+    transparent 224deg,
+    color-mix(in srgb, var(--accent-primary) 66%, var(--accent-secondary)) 286deg,
+    transparent 360deg
+  ) !important;
+
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0) !important;
+  -webkit-mask-composite: xor !important;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0) !important;
+  mask-composite: exclude !important;
+
+  opacity: 0.82 !important;
+  filter: drop-shadow(0 0 7px color-mix(in srgb, var(--accent-primary) 22%, transparent)) !important;
+  animation: glass-orbit 18s linear infinite !important;
+}
+
+/*
+ * Lifted edge: a crisp white top highlight, then a nearly imperceptible
+ * perimeter reflection. This sits on the pane itself above the animated rim.
+ */
+.page-header,
+.page > #quartz-body > .sidebar.left,
+.page > #quartz-body > .sidebar.right > *,
+.graph > .global-graph-outer > .global-graph-container {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.045),
+    0 18px 52px -24px var(--glass-shadow) !important;
+}
+
+/* Smaller UI glass remains smooth too, but without the animated rim. */
+.properties,
+.note-properties,
+.table-container,
+pre,
+.search > .search-button,
+button.search-button,
+.darkmode,
+.readermode,
+.graph > .graph-outer {
+  background-image: none !important;
+  background-color: color-mix(in srgb, var(--glass-fill) 42%, transparent) !important;
+}
+
+/* Remove the old textured decorative pseudo-layer from anything that inherited
+ * the original glass-panel mixin but is not using the animated major-card rim. */
+.properties::after,
+.note-properties::after,
+.table-container::after,
+pre::after,
+.search > .search-button::after,
+button.search-button::after,
+.darkmode::after,
+.readermode::after {
+  background-image: none !important;
+  filter: none !important;
+}
+
+/* Mobile Explorer previously inherited a noise image as part of its backdrop. */
+@media all and (max-width: 800px) {
+  .explorer .explorer-content {
+    background-image: linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--surface-base) 94%, transparent),
+      color-mix(in srgb, var(--surface-deep) 94%, transparent)
+    ) !important;
+  }
+}
