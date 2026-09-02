@@ -1,9 +1,9 @@
 /*
- * Glass optics.
+ * Glass optics — exaggerated Vercel diagnostic.
  *
- * Vercel experiment: re-enable the hidden SVG turbulence + displacement filter
- * on the three major panes only. Smaller UI glass stays on ordinary blur so we
- * can judge the optical effect without making the whole interface expensive.
+ * Major panes deliberately use very high SVG displacement and very little blur.
+ * If Chromium is truly applying the SVG URL filter to the captured backdrop,
+ * moving background lines should bend dramatically inside these panes.
  */
 
 .deyotlan-glass-filter-defs {
@@ -14,27 +14,26 @@
   pointer-events: none;
 }
 
-/* Major panes: live SVG displacement + blur/saturation. */
+/* Major panes: extreme live SVG displacement + minimal blur. */
 .page-header,
 .page > #quartz-body > .sidebar.left,
 .page > #quartz-body > .sidebar.right > * {
-  -webkit-backdrop-filter: blur(7px) saturate(168%) contrast(103%) !important;
+  -webkit-backdrop-filter: blur(2px) saturate(170%) contrast(104%) !important;
   backdrop-filter:
     url("#deyotlan-glass-refraction")
-    blur(7px)
-    saturate(168%)
-    contrast(103%) !important;
+    blur(2px)
+    saturate(170%)
+    contrast(104%) !important;
 
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.34),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
     0 18px 52px -24px var(--glass-shadow) !important;
 
-  background-color: color-mix(in srgb, var(--glass-fill) 46%, transparent) !important;
+  background-color: color-mix(in srgb, var(--glass-fill) 40%, transparent) !important;
 }
 
-/* The global graph modal is still glass, but does not participate in the
- * displacement experiment yet. */
+/* The global graph modal stays on normal glass for this diagnostic. */
 .graph > .global-graph-outer > .global-graph-container {
   -webkit-backdrop-filter: blur(7px) saturate(168%) contrast(103%) !important;
   backdrop-filter: blur(7px) saturate(168%) contrast(103%) !important;
@@ -44,7 +43,7 @@
     0 18px 52px -24px var(--glass-shadow) !important;
 }
 
-/* Smaller embedded glass: normal accelerated backdrop filtering. */
+/* Smaller embedded glass: ordinary accelerated backdrop filtering. */
 .properties,
 .note-properties,
 .table-container,
@@ -71,11 +70,11 @@ button.search-button,
     inset 0 0 48px rgba(0, 0, 0, 0.10) !important;
 }
 
-/* If URL filters are rejected by the browser, retain clean frosted glass. */
+/* If URL filters are rejected outright, retain a clean low-blur fallback. */
 @supports not (backdrop-filter: url("#deyotlan-glass-refraction") blur(1px)) {
   .page-header,
   .page > #quartz-body > .sidebar.left,
   .page > #quartz-body > .sidebar.right > * {
-    backdrop-filter: blur(7px) saturate(168%) contrast(103%) !important;
+    backdrop-filter: blur(2px) saturate(170%) contrast(104%) !important;
   }
 }
