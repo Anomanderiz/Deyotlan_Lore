@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=./quartz/plugins/quartz-plugins.schema.json
 configuration:
-  pageTitle: Quartz 5
+  pageTitle: Deyotlan Lore
   pageTitleSuffix: ""
   enableSPA: true
   enablePopovers: true
@@ -164,6 +164,35 @@ plugins:
       priority: 50
   - source: "@quartz-community/graph"
     enabled: true
+    options:
+      localGraph:
+        drag: true
+        zoom: true
+        depth: 1
+        scale: 1.18
+        repelForce: 0.86
+        centerForce: 0.24
+        linkDistance: 54
+        fontSize: 0.7
+        opacityScale: 1
+        showTags: false
+        removeTags: []
+        focusOnHover: true
+        enableRadial: false
+      globalGraph:
+        drag: true
+        zoom: true
+        depth: -1
+        scale: 0.94
+        repelForce: 0.78
+        centerForce: 0.18
+        linkDistance: 48
+        fontSize: 0.68
+        opacityScale: 1
+        showTags: false
+        removeTags: []
+        focusOnHover: true
+        enableRadial: false
     layout:
       position: right
       priority: 10
@@ -196,7 +225,7 @@ plugins:
       position: beforeBody
       priority: 30
   - source: "@quartz-community/page-title"
-    enabled: true
+    enabled: false
     layout:
       position: left
       priority: 10
