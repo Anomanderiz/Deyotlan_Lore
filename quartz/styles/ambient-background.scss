@@ -1,23 +1,23 @@
 /*
  * Moving ambient field behind the glass.
  *
- * One continuous, viewport-sized stripe field is shared by the page and the
- * refracted glass copies. --line-shift is animated on body and inherited by
- * every pane, keeping the outside and inside geometry phase-locked.
+ * The line field is one continuous repeating gradient. It moves in one
+ * direction only, and the animation endpoint is exactly one stripe period
+ * along the gradient axis, so the loop has no visible jump or reversal.
  */
 
-@property --line-shift {
-  syntax: "<length>";
-  inherits: true;
-  initial-value: -110px;
-}
-
-@keyframes deyotlan-line-phase {
+/*
+ * Stripe period = 48px.
+ * At 135deg the gradient axis has equal X/Y components, so moving
+ * 48 / sqrt(2) = 33.941125px on both axes advances the pattern by one
+ * complete period. The final frame is therefore pixel-identical to the first.
+ */
+@keyframes deyotlan-line-scroll {
   from {
-    --line-shift: -110px;
+    background-position: 0 0;
   }
   to {
-    --line-shift: 110px;
+    background-position: 33.941125px 33.941125px;
   }
 }
 
@@ -41,9 +41,6 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
 
-  /* Animate the shared stripe phase once, then let descendants inherit it. */
-  animation: deyotlan-line-phase 38s linear infinite alternate;
-
   background-color: var(--surface-base) !important;
   background-image:
     radial-gradient(
@@ -66,12 +63,9 @@ body {
 }
 
 /*
- * Continuous diagonal geometry.
- *
- * There is deliberately NO tiled background-size here. The old square tiling
- * cut a diagonal gradient at tile boundaries, which is what made the lines
- * appear broken. A repeating-linear-gradient already repeats internally and
- * therefore gives us infinitely long, unbroken stripes by itself.
+ * Continuous diagonal geometry. A repeating-linear-gradient already extends
+ * every stripe across the full painting area; no square background tiling is
+ * used, so individual lines cannot terminate at tile boundaries.
  */
 body::before {
   content: "" !important;
@@ -82,19 +76,18 @@ body::before {
   pointer-events: none !important;
 
   background-image: repeating-linear-gradient(
-    116deg,
+    135deg,
     color-mix(in srgb, var(--accent-secondary) 22%, rgba(255, 255, 255, 0.14)) 0 1px,
-    transparent 1px 38px
+    transparent 1px 48px
   ) !important;
-  background-position: var(--line-shift) 0 !important;
   background-repeat: no-repeat !important;
   background-size: 180vw 180vh !important;
-  background-attachment: fixed !important;
 
   opacity: 0.34 !important;
   filter: none !important;
   mix-blend-mode: screen;
   will-change: background-position;
+  animation: deyotlan-line-scroll 22s linear infinite !important;
 }
 
 /* Large blurred colour masses move independently behind the line field. */
@@ -146,12 +139,9 @@ html[saved-theme="light"] body::before {
   mix-blend-mode: multiply;
 }
 
-html:has(a.tag-link[href*="tags/fey"]) body {
-  animation-duration: 46s;
-}
-
 html:has(a.tag-link[href*="tags/fey"]) body::before {
   opacity: 0.25 !important;
+  animation-duration: 30s !important;
 }
 
 html:has(a.tag-link[href*="tags/fey"]) body::after {
@@ -168,7 +158,7 @@ html:has(a.tag-link[href*="tags/fey"]) body::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body,
+  body::before,
   body::after {
     animation: none !important;
   }
