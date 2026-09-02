@@ -45,6 +45,8 @@ jobs:
         run: npx quartz plugin install --from-config
       - name: Install Quartz default theme
         run: npm install --no-save @quartz-themes/default
+      - name: Use Deyotlan as homepage
+        run: cp "content/Deyotlan Lore/Deyotlan.md" content/index.md
       - name: Build Quartz
         run: npx quartz build
       - name: Upload artifact
