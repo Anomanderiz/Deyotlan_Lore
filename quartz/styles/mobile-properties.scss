@@ -1,0 +1,103 @@
+/* Mobile repair for @quartz-community/note-properties.
+ * The upstream component uses a fixed two-column table; on narrow screens
+ * that crushes tag values into character-wide pills. Stack each property
+ * instead and let tags wrap naturally.
+ */
+
+@media all and (max-width: 800px) {
+  .note-properties {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    font-size: 0.92rem !important;
+  }
+
+  .note-properties-header {
+    padding: 0.65rem 0.8rem !important;
+  }
+
+  .note-properties-table,
+  .note-properties-table tbody {
+    display: block !important;
+    width: 100% !important;
+    table-layout: auto !important;
+  }
+
+  .note-properties-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 0.35rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0.7rem 0.8rem !important;
+  }
+
+  .note-properties-key,
+  .note-properties-value {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+    word-break: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .note-properties-key {
+    font-size: 0.76rem !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.045em !important;
+    text-transform: uppercase !important;
+    opacity: 0.78 !important;
+  }
+
+  .note-properties-value {
+    line-height: 1.5 !important;
+  }
+
+  .note-properties-tags {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .note-properties-tags .tag-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    width: auto !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding: 0.18rem 0.5rem !important;
+    border-radius: 999px !important;
+    line-height: 1.25 !important;
+    white-space: nowrap !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+  }
+
+  .note-properties-tags .note-properties-separator {
+    display: none !important;
+  }
+
+  .note-properties-list {
+    display: block !important;
+    width: 100% !important;
+  }
+}
+
+@media all and (max-width: 420px) {
+  .note-properties-row {
+    padding: 0.62rem 0.7rem !important;
+  }
+
+  .note-properties-tags {
+    gap: 0.3rem !important;
+  }
+
+  .note-properties-tags .tag-link {
+    font-size: 0.78rem !important;
+  }
+}
