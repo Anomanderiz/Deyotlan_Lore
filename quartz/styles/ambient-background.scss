@@ -1,0 +1,168 @@
+/*
+ * Moving ambient field behind the glass.
+ * The motion lives on the page background, never on the panes themselves,
+ * so the SVG backdrop refraction has visible geometry to bend.
+ */
+
+@keyframes deyotlan-line-drift {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: 128px 0, -64px 0;
+  }
+}
+
+@keyframes deyotlan-ambient-drift {
+  0%,
+  100% {
+    transform: translate3d(-2.5%, -1.5%, 0) scale(1.03);
+  }
+  50% {
+    transform: translate3d(2.5%, 1.75%, 0) scale(1.08);
+  }
+}
+
+@keyframes deyotlan-ambient-breathe {
+  0%,
+  100% {
+    opacity: 0.76;
+  }
+  50% {
+    opacity: 0.94;
+  }
+}
+
+body {
+  position: relative;
+  isolation: isolate;
+  overflow-x: hidden;
+  min-height: 100vh;
+
+  /* A broad, soft colour field. Fey pages inherit their purple/green palette
+   * automatically through --accent-primary / --accent-secondary. */
+  background-color: var(--surface-base) !important;
+  background-image:
+    radial-gradient(
+      58rem 42rem at 12% 8%,
+      color-mix(in srgb, var(--accent-primary) 24%, transparent),
+      transparent 67%
+    ),
+    radial-gradient(
+      48rem 38rem at 92% 18%,
+      color-mix(in srgb, var(--accent-secondary) 18%, transparent),
+      transparent 69%
+    ),
+    radial-gradient(
+      52rem 42rem at 58% 96%,
+      color-mix(in srgb, var(--accent-primary) 12%, var(--accent-secondary) 6%, transparent),
+      transparent 72%
+    ),
+    linear-gradient(145deg, var(--surface-base), var(--surface-deep)) !important;
+  background-attachment: fixed;
+}
+
+/* Fine diagonal geometry. This is deliberately simple: it exists to reveal
+ * refraction when it passes beneath a pane, not to become the visual subject. */
+body::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: -12% !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+
+  background-image:
+    repeating-linear-gradient(
+      116deg,
+      color-mix(in srgb, var(--accent-secondary) 20%, rgba(255, 255, 255, 0.12)) 0 1px,
+      transparent 1px 34px
+    ),
+    repeating-linear-gradient(
+      116deg,
+      transparent 0 68px,
+      color-mix(in srgb, var(--accent-primary) 13%, rgba(255, 255, 255, 0.08)) 68px 69px,
+      transparent 69px 136px
+    ) !important;
+  background-size: 136px 136px, 272px 272px !important;
+
+  opacity: 0.32 !important;
+  filter: none !important;
+  mix-blend-mode: screen;
+  will-change: background-position;
+  animation: deyotlan-line-drift 34s linear infinite !important;
+}
+
+/* Large blurred colour masses move independently beneath the line field.
+ * Their very slow motion produces subtle changing highlights through the glass. */
+body::after {
+  content: "" !important;
+  position: fixed !important;
+  inset: -18% !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+
+  background:
+    radial-gradient(
+      circle at 24% 24%,
+      color-mix(in srgb, var(--accent-primary) 38%, transparent) 0,
+      color-mix(in srgb, var(--accent-primary) 14%, transparent) 25%,
+      transparent 52%
+    ),
+    radial-gradient(
+      circle at 76% 68%,
+      color-mix(in srgb, var(--accent-secondary) 30%, transparent) 0,
+      color-mix(in srgb, var(--accent-secondary) 10%, transparent) 24%,
+      transparent 54%
+    ) !important;
+  background-size: cover !important;
+
+  opacity: 0.84 !important;
+  filter: blur(68px) saturate(112%) !important;
+  mix-blend-mode: normal !important;
+  will-change: transform, opacity;
+  animation:
+    deyotlan-ambient-drift 28s ease-in-out infinite,
+    deyotlan-ambient-breathe 19s ease-in-out infinite !important;
+}
+
+/* Keep all Quartz content above the moving optical field. */
+.page {
+  position: relative;
+  z-index: 1;
+}
+
+/* Slightly gentler geometry in light mode so it does not become ruled paper. */
+html[saved-theme="light"] body::before {
+  opacity: 0.20 !important;
+  mix-blend-mode: multiply;
+}
+
+/* Fey pages are intended to feel softer and more organic than Deyotlan. */
+html:has(a.tag-link[href*="tags/fey"]) body::before {
+  opacity: 0.24 !important;
+  background-size: 152px 152px, 304px 304px !important;
+  animation-duration: 42s !important;
+}
+
+html:has(a.tag-link[href*="tags/fey"]) body::after {
+  filter: blur(82px) saturate(108%) !important;
+  animation-duration: 34s, 23s !important;
+}
+
+@media all and (max-width: 800px) {
+  body::before {
+    opacity: 0.24 !important;
+  }
+
+  body::after {
+    opacity: 0.72 !important;
+    filter: blur(56px) saturate(110%) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after {
+    animation: none !important;
+  }
+}
