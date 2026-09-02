@@ -1,23 +1,21 @@
 /*
  * Moving ambient field behind the glass.
  *
- * The line field is one continuous repeating gradient. It moves in one
- * direction only, and the animation endpoint is exactly one stripe period
- * along the gradient axis, so the loop has no visible jump or reversal.
+ * The stripe sheet moves in ONE direction via compositor-friendly transform.
+ * The end transform advances the pattern by exactly one 48px stripe period,
+ * so the loop reset is visually identical to the starting frame.
  */
 
 /*
- * Stripe period = 48px.
- * At 135deg the gradient axis has equal X/Y components, so moving
- * 48 / sqrt(2) = 33.941125px on both axes advances the pattern by one
- * complete period. The final frame is therefore pixel-identical to the first.
+ * For a 135deg gradient, equal X/Y motion of 33.941125px advances the pattern
+ * 48px along its gradient axis: sqrt(33.941125^2 + 33.941125^2) = 48px.
  */
 @keyframes deyotlan-line-scroll {
   from {
-    background-position: 0 0;
+    transform: translate3d(0, 0, 0);
   }
   to {
-    background-position: 33.941125px 33.941125px;
+    transform: translate3d(33.941125px, 33.941125px, 0);
   }
 }
 
@@ -63,15 +61,16 @@ body {
 }
 
 /*
- * Continuous diagonal geometry. A repeating-linear-gradient already extends
- * every stripe across the full painting area; no square background tiling is
- * used, so individual lines cannot terminate at tile boundaries.
+ * One continuous stripe sheet. The pseudo-element is deliberately oversized
+ * so its small transform never exposes an edge. We animate transform instead
+ * of background-position to keep the motion on the compositor and avoid the
+ * repaint hitching seen in the previous version.
  */
 body::before {
   content: "" !important;
   display: block !important;
   position: fixed !important;
-  inset: -18% !important;
+  inset: -24% !important;
   z-index: 0 !important;
   pointer-events: none !important;
 
@@ -80,14 +79,14 @@ body::before {
     color-mix(in srgb, var(--accent-secondary) 22%, rgba(255, 255, 255, 0.14)) 0 1px,
     transparent 1px 48px
   ) !important;
-  background-repeat: no-repeat !important;
-  background-size: 180vw 180vh !important;
 
   opacity: 0.34 !important;
   filter: none !important;
   mix-blend-mode: screen;
-  will-change: background-position;
-  animation: deyotlan-line-scroll 22s linear infinite !important;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  will-change: transform;
+  animation: deyotlan-line-scroll 14s linear infinite !important;
 }
 
 /* Large blurred colour masses move independently behind the line field. */
@@ -141,7 +140,7 @@ html[saved-theme="light"] body::before {
 
 html:has(a.tag-link[href*="tags/fey"]) body::before {
   opacity: 0.25 !important;
-  animation-duration: 30s !important;
+  animation-duration: 18s !important;
 }
 
 html:has(a.tag-link[href*="tags/fey"]) body::after {
