@@ -1,0 +1,312 @@
+/*
+ * Mobile-specific presentation for Deyotlan Glass.
+ * Desktop panes become compact mobile controls; article readability wins.
+ */
+
+@media all and (max-width: 800px) {
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    /* Keep the palette, reduce visual competition and GPU work on phones. */
+    background-attachment: scroll !important;
+  }
+
+  body::before {
+    opacity: 0.10 !important;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  body::after {
+    opacity: 0.48 !important;
+    filter: blur(48px) saturate(105%) !important;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .page {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 !important;
+  }
+
+  .page > #quartz-body {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 12px !important;
+    column-gap: 0 !important;
+    row-gap: 10px !important;
+  }
+
+  /* ---------------------------------------------------------------------- */
+  /* Mobile top bar: Quartz already changes the left rail into a toolbar.   */
+  /* Stop treating that toolbar like a full-height desktop glass card.       */
+  /* ---------------------------------------------------------------------- */
+
+  .page > #quartz-body > .sidebar.left {
+    position: relative !important;
+    top: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 12px 0 4px !important;
+    gap: 8px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    overflow: visible !important;
+  }
+
+  .page > #quartz-body > .sidebar.left::before,
+  .page > #quartz-body > .sidebar.left::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  .sidebar.left > .flex-component,
+  .sidebar.left .flex-component {
+    min-width: 0;
+    gap: 6px !important;
+  }
+
+  .search {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .search > .search-button,
+  button.search-button {
+    min-width: 0;
+    width: 100% !important;
+    height: 40px;
+    border-radius: 12px !important;
+    background: color-mix(in srgb, var(--glass-fill) 58%, transparent) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(145%) !important;
+    backdrop-filter: blur(12px) saturate(145%) !important;
+  }
+
+  .darkmode,
+  .readermode {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    flex: 0 0 40px !important;
+    border-radius: 12px !important;
+    -webkit-backdrop-filter: blur(12px) saturate(145%) !important;
+    backdrop-filter: blur(12px) saturate(145%) !important;
+  }
+
+  /* Explorer opens as Quartz's mobile drawer rather than occupying the page. */
+  .explorer {
+    min-width: 0;
+  }
+
+  button.mobile-explorer {
+    min-height: 40px;
+    border-radius: 12px !important;
+  }
+
+  .explorer .explorer-content {
+    box-sizing: border-box;
+    max-width: 100vw !important;
+    background:
+      linear-gradient(
+        145deg,
+        color-mix(in srgb, var(--surface-base) 90%, transparent),
+        color-mix(in srgb, var(--surface-deep) 92%, transparent)
+      ) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(135%) !important;
+    backdrop-filter: blur(20px) saturate(135%) !important;
+  }
+
+  /* ---------------------------------------------------------------------- */
+  /* Header                                                                  */
+  /* ---------------------------------------------------------------------- */
+
+  .page-header {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 4px 0 12px !important;
+    padding: 14px 15px !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.035), transparent 36%),
+      color-mix(in srgb, var(--glass-fill) 62%, transparent) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(145%) !important;
+    backdrop-filter: blur(14px) saturate(145%) !important;
+  }
+
+  .page-header::after {
+    /* Keep a restrained version of the luminous desktop rim. */
+    opacity: 0.68 !important;
+    filter:
+      brightness(1.15)
+      saturate(1.1)
+      drop-shadow(0 0 5px color-mix(in srgb, var(--accent-secondary) 42%, transparent))
+      drop-shadow(0 0 10px color-mix(in srgb, var(--accent-primary) 30%, transparent)) !important;
+    animation-duration: 28s !important;
+  }
+
+  .page-header h1,
+  .page-header .article-title {
+    font-size: clamp(1.45rem, 7vw, 1.8rem) !important;
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+  }
+
+  .page-header .breadcrumbs {
+    font-size: 0.78rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+
+  .page-header .breadcrumbs::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ---------------------------------------------------------------------- */
+  /* Main article                                                            */
+  /* ---------------------------------------------------------------------- */
+
+  .page > #quartz-body > .center {
+    width: 100%;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 0 12px !important;
+  }
+
+  article {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 0 2px !important;
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  article h1 {
+    font-size: 1.7rem !important;
+  }
+
+  article h2 {
+    font-size: 1.35rem !important;
+  }
+
+  article img,
+  article video,
+  article iframe {
+    max-width: 100% !important;
+    height: auto;
+  }
+
+  .table-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px !important;
+  }
+
+  .table-container > table {
+    min-width: max-content;
+  }
+
+  .properties,
+  .note-properties,
+  pre {
+    max-width: 100%;
+    box-sizing: border-box;
+    border-radius: 12px !important;
+  }
+
+  /* ---------------------------------------------------------------------- */
+  /* Lower rail: stack cards vertically instead of squeezing them in a row. */
+  /* ---------------------------------------------------------------------- */
+
+  .page > #quartz-body > .sidebar.right {
+    width: 100% !important;
+    height: auto !important;
+    margin: 4px 0 0 !important;
+    padding: 0 !important;
+    gap: 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    overflow: visible !important;
+  }
+
+  .page > #quartz-body > .sidebar.right > * {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    box-sizing: border-box;
+    padding: 14px !important;
+    border-radius: 16px !important;
+    flex: none !important;
+    overflow: hidden;
+  }
+
+  .page > #quartz-body > .sidebar.right > *::after {
+    opacity: 0.42 !important;
+    filter:
+      brightness(1.08)
+      drop-shadow(0 0 6px color-mix(in srgb, var(--accent-primary) 22%, transparent)) !important;
+    animation-duration: 32s !important;
+  }
+
+  .graph > .graph-outer {
+    width: 100%;
+    height: 230px !important;
+  }
+
+  /* Quartz hides the TOC on mobile already; reinforce it to avoid odd cards. */
+  .page > #quartz-body > .sidebar.right > .toc {
+    display: none !important;
+  }
+
+  /* Footer should read as footer, not a stranded desktop-column fragment. */
+  footer,
+  .page-footer {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 12px 0 20px !important;
+    padding: 0 !important;
+    font-size: 0.82rem;
+  }
+}
+
+/* Very narrow phones */
+@media all and (max-width: 420px) {
+  .page > #quartz-body {
+    padding: 0 10px !important;
+  }
+
+  .page-header {
+    padding: 12px 13px !important;
+  }
+
+  article {
+    font-size: 0.97rem;
+  }
+
+  .graph > .graph-outer {
+    height: 205px !important;
+  }
+}
