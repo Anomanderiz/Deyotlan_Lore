@@ -152,6 +152,30 @@
     overflow: visible !important;
   }
 
+  /*
+   * Flatten the redundant vault root on phones.
+   * Quartz builds every published page beneath one top-level "Deyotlan Lore"
+   * folder. Hide that folder heading and force its immediate child list open,
+   * so opening Navigation lands directly on the page titles. Genuine folders
+   * below this level keep their normal collapse controls.
+   */
+  .explorer-ul > li:has(> .folder-container[data-folderpath*="deyotlan" i]) > .folder-container {
+    display: none !important;
+  }
+
+  .explorer-ul > li:has(> .folder-container[data-folderpath*="deyotlan" i]) > .folder-outer {
+    visibility: visible !important;
+    display: grid !important;
+    grid-template-rows: 1fr !important;
+  }
+
+  .explorer-ul > li:has(> .folder-container[data-folderpath*="deyotlan" i]) > .folder-outer > ul {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    border-left: 0 !important;
+    overflow: visible !important;
+  }
+
   /* Mobile performance: no SVG refraction on remaining rail/header cards,
    * and no continuously rotating card rims. */
   .page-header,
