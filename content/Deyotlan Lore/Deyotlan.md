@@ -4,12 +4,11 @@ aliases:
   - The Solar Empire
   - Realm of the Sun
 created: 2026-08-31T23:43:24.426Z
-modified: 2026-09-02T17:05:51.118Z
+modified: 2026-09-02T17:55:01.029Z
 tags:
   - lore
   - nation
   - dwarves
-  - fey
   - politics
   - Deyonahua
 ---
