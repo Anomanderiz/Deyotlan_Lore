@@ -1,9 +1,19 @@
 /*
- * Glass optics — exaggerated Vercel diagnostic.
+ * Glass optics.
  *
- * Major panes deliberately use very high SVG displacement and very little blur.
- * If Chromium is truly applying the SVG URL filter to the captured backdrop,
- * moving background lines should bend dramatically inside these panes.
+ * Chromium currently composites an SVG URL used in backdrop-filter as a warped
+ * overlay while leaving the original backdrop visible beneath it. That creates
+ * a straight stripe plus a distorted "ghost" stripe — not convincing glass.
+ *
+ * Major panes therefore use a replacement-view technique:
+ *   1. redraw the same viewport-locked ambient background inside the pane,
+ *   2. distort that rendered copy with ordinary CSS filter:url(...),
+ *   3. let the copy fully cover the undistorted backdrop inside the pane,
+ *   4. keep the pane's tint, lifted edge and animated rim above it.
+ *
+ * Because the inner stripe sheet is viewport-fixed and shares the exact same
+ * animation period as body::before, a stripe meets the pane at the correct
+ * location and then visibly bends inside it.
  */
 
 .deyotlan-glass-filter-defs {
@@ -14,26 +24,161 @@
   pointer-events: none;
 }
 
-/* Major panes: extreme live SVG displacement + minimal blur. */
+html {
+  --refracted-line-color: color-mix(
+    in srgb,
+    var(--accent-secondary) 22%,
+    rgba(255, 255, 255, 0.14)
+  );
+}
+
+html[saved-theme="light"] {
+  --refracted-line-color: color-mix(
+    in srgb,
+    var(--accent-secondary) 13%,
+    rgba(70, 45, 35, 0.10)
+  );
+}
+
+@keyframes deyotlan-refracted-line-scroll {
+  from {
+    background-position:
+      0 0,
+      0 0,
+      0 0,
+      0 0,
+      0 0,
+      0 0,
+      0 0,
+      0 0;
+  }
+  to {
+    background-position:
+      33.941125px 33.941125px,
+      0 0,
+      0 0,
+      0 0,
+      0 0,
+      0 0,
+      0 0,
+      0 0;
+  }
+}
+
+/*
+ * Disable the failed live-backdrop SVG path entirely on major panes. The
+ * ordinary blur remains on small UI elements below; the large panes get their
+ * optical distortion from their replacement ::before surface instead.
+ */
 .page-header,
 .page > #quartz-body > .sidebar.left,
 .page > #quartz-body > .sidebar.right > * {
-  -webkit-backdrop-filter: blur(2px) saturate(170%) contrast(104%) !important;
-  backdrop-filter:
-    url("#deyotlan-glass-refraction")
-    blur(2px)
-    saturate(170%)
-    contrast(104%) !important;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.42),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
-    0 18px 52px -24px var(--glass-shadow) !important;
-
-  background-color: color-mix(in srgb, var(--glass-fill) 40%, transparent) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 }
 
-/* The global graph modal stays on normal glass for this diagnostic. */
+/*
+ * Refracted replacement surface. It is deliberately a fully rendered ambient
+ * field, not a translucent overlay, so the straight stripe underneath cannot
+ * remain visible. The pane itself remains visually translucent because this
+ * replica depicts exactly what lies behind it, merely displaced/tinted.
+ */
+.page-header::before,
+.page > #quartz-body > .sidebar.left::before,
+.page > #quartz-body > .sidebar.right > *::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: -2 !important;
+  pointer-events: none !important;
+  border-radius: inherit !important;
+  clip-path: inset(0 round 20px);
+
+  background-color: var(--surface-base) !important;
+  background-image:
+    /* moving stripe field */
+    repeating-linear-gradient(
+      135deg,
+      var(--refracted-line-color) 0 1px,
+      transparent 1px 48px
+    ),
+    /* moving-ambient approximation */
+    radial-gradient(
+      circle at 24% 24%,
+      color-mix(in srgb, var(--accent-primary) 34%, transparent) 0,
+      color-mix(in srgb, var(--accent-primary) 12%, transparent) 25%,
+      transparent 52%
+    ),
+    radial-gradient(
+      circle at 76% 68%,
+      color-mix(in srgb, var(--accent-secondary) 26%, transparent) 0,
+      color-mix(in srgb, var(--accent-secondary) 9%, transparent) 24%,
+      transparent 54%
+    ),
+    /* page-wide colour wash */
+    radial-gradient(
+      58rem 42rem at 12% 8%,
+      color-mix(in srgb, var(--accent-primary) 24%, transparent),
+      transparent 67%
+    ),
+    radial-gradient(
+      48rem 38rem at 92% 18%,
+      color-mix(in srgb, var(--accent-secondary) 18%, transparent),
+      transparent 69%
+    ),
+    radial-gradient(
+      52rem 42rem at 58% 96%,
+      color-mix(in srgb, var(--accent-primary) 12%, var(--accent-secondary) 6%, transparent),
+      transparent 72%
+    ),
+    /* smoked-glass tint */
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--glass-fill) 34%, transparent),
+      color-mix(in srgb, var(--glass-fill-strong) 26%, transparent)
+    ),
+    linear-gradient(145deg, var(--surface-base), var(--surface-deep)) !important;
+
+  /* All layers are anchored to the viewport, so they line up across panes. */
+  background-attachment:
+    fixed,
+    fixed,
+    fixed,
+    fixed,
+    fixed,
+    fixed,
+    fixed,
+    fixed !important;
+
+  background-position:
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0;
+
+  /* Ordinary filter:url() reliably distorts this element's own pixels. */
+  filter:
+    url("#deyotlan-glass-refraction")
+    blur(1.5px)
+    saturate(1.68)
+    contrast(1.04) !important;
+
+  transform: translateZ(0);
+  will-change: background-position;
+  animation: deyotlan-refracted-line-scroll 14s linear infinite !important;
+}
+
+html:has(a.tag-link[href*="tags/fey"]) .page-header::before,
+html:has(a.tag-link[href*="tags/fey"]) .page > #quartz-body > .sidebar.left::before,
+html:has(a.tag-link[href*="tags/fey"]) .page > #quartz-body > .sidebar.right > *::before {
+  animation-duration: 18s !important;
+}
+
+/* The global graph modal is still straightforward frosted glass. */
 .graph > .global-graph-outer > .global-graph-container {
   -webkit-backdrop-filter: blur(7px) saturate(168%) contrast(103%) !important;
   backdrop-filter: blur(7px) saturate(168%) contrast(103%) !important;
@@ -43,7 +188,7 @@
     0 18px 52px -24px var(--glass-shadow) !important;
 }
 
-/* Smaller embedded glass: ordinary accelerated backdrop filtering. */
+/* Smaller embedded glass: normal accelerated backdrop filtering. */
 .properties,
 .note-properties,
 .table-container,
@@ -70,11 +215,10 @@ button.search-button,
     inset 0 0 48px rgba(0, 0, 0, 0.10) !important;
 }
 
-/* If URL filters are rejected outright, retain a clean low-blur fallback. */
-@supports not (backdrop-filter: url("#deyotlan-glass-refraction") blur(1px)) {
-  .page-header,
-  .page > #quartz-body > .sidebar.left,
-  .page > #quartz-body > .sidebar.right > * {
-    backdrop-filter: blur(2px) saturate(170%) contrast(104%) !important;
+@media (prefers-reduced-motion: reduce) {
+  .page-header::before,
+  .page > #quartz-body > .sidebar.left::before,
+  .page > #quartz-body > .sidebar.right > *::before {
+    animation: none !important;
   }
 }
