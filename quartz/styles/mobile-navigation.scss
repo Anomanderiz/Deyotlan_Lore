@@ -1,10 +1,10 @@
 /*
  * Mobile navigation polish.
  *
- * The existing Quartz Explorer remains the navigation mechanism; on phones its
- * mobile toggle becomes a persistent floating action button instead of taking
- * space in the top toolbar. The drawer itself is viewport-fixed so it remains
- * usable regardless of the article scroll position.
+ * Quartz itself owns Explorer open/closed state by toggling `.collapsed` on
+ * the `.explorer` wrapper. We preserve that native state machine and only
+ * change the mobile geometry: the trigger is a viewport-fixed FAB and the
+ * drawer itself is viewport-fixed, so both remain usable at any scroll depth.
  */
 
 @media all and (max-width: 800px) {
@@ -15,14 +15,17 @@
     flex: 1 1 auto !important;
   }
 
-  /* The Explorer wrapper should not reserve a slot in the top bar. */
+  /* The Explorer wrapper should not reserve a visible slot in the top bar. */
   .sidebar.left > .explorer {
     position: static !important;
     flex: 0 0 0 !important;
     width: 0 !important;
     min-width: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
+    overflow: visible !important;
   }
 
   /* Persistent lower-corner navigation FAB. */
@@ -56,7 +59,7 @@
       0 8px 28px rgba(0,0,0,0.34),
       0 0 22px color-mix(in srgb, var(--accent-primary) 18%, transparent) !important;
 
-    z-index: 10030 !important;
+    z-index: 10020 !important;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
     transition: transform 120ms ease, border-color 160ms ease, box-shadow 160ms ease !important;
@@ -78,16 +81,13 @@
   }
 
   /*
-   * True viewport-anchored navigation panel.
+   * Viewport-fixed navigation drawer.
    *
-   * Quartz normally expands explorer-content where the Explorer lives in the
-   * document. That works at the top of the page, but if the user has scrolled
-   * down the resulting drawer opens off-screen. We preserve Quartz's own
-   * aria-expanded toggle while taking the panel completely out of document
-   * flow. It therefore opens in exactly the same place on the phone at every
-   * scroll position.
+   * IMPORTANT: Quartz toggles `.collapsed` on the parent `.explorer`; do not
+   * replace this with our own aria/display state. These rules simply map the
+   * native state to a fixed off-canvas panel.
    */
-  .explorer .explorer-content {
+  .explorer > .explorer-content {
     position: fixed !important;
     top: calc(12px + env(safe-area-inset-top, 0px)) !important;
     right: calc(12px + env(safe-area-inset-right, 0px)) !important;
@@ -95,73 +95,64 @@
     left: calc(12px + env(safe-area-inset-left, 0px)) !important;
 
     width: auto !important;
-    min-width: 0 !important;
     max-width: none !important;
     height: auto !important;
-    min-height: 0 !important;
     max-height: none !important;
     margin: 0 !important;
     padding: 18px 16px !important;
     box-sizing: border-box !important;
 
-    display: block !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
 
-    border: 1px solid color-mix(in srgb, var(--accent-secondary) 22%, rgba(255,255,255,0.12)) !important;
-    border-radius: 20px !important;
+    border: 1px solid color-mix(in srgb, var(--accent-secondary) 18%, rgba(255,255,255,0.10)) !important;
+    border-radius: 22px !important;
     background:
       radial-gradient(circle at 88% 8%, color-mix(in srgb, var(--accent-primary) 10%, transparent), transparent 34%),
       linear-gradient(145deg, var(--surface-base), var(--surface-deep)) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.09),
+      0 18px 60px rgba(0,0,0,0.44) !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.10),
-      0 22px 58px rgba(0,0,0,0.44) !important;
 
-    z-index: 10020 !important;
-
-    /* Closed state. These override Quartz's document-flow expansion without
-     * interfering with its JavaScript state handling. */
+    z-index: 10010 !important;
+    transform: translateY(18px) scale(0.985) !important;
     opacity: 0 !important;
     visibility: hidden !important;
     pointer-events: none !important;
-    transform: translateY(10px) scale(0.985) !important;
-    transform-origin: bottom right !important;
     transition:
+      transform 180ms ease,
       opacity 150ms ease,
-      transform 170ms cubic-bezier(0.2, 0.8, 0.2, 1),
-      visibility 0s linear 170ms !important;
+      visibility 150ms ease !important;
   }
 
-  .explorer .explorer-content[aria-expanded="true"] {
+  /* Native Quartz closed state. */
+  .explorer.collapsed > .explorer-content {
+    transform: translateY(18px) scale(0.985) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* Native Quartz open state. */
+  .explorer:not(.collapsed) > .explorer-content {
+    transform: translateY(0) scale(1) !important;
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
-    transform: translateY(0) scale(1) !important;
-    transition:
-      opacity 150ms ease,
-      transform 170ms cubic-bezier(0.2, 0.8, 0.2, 1),
-      visibility 0s linear 0s !important;
   }
 
-  .explorer .explorer-content[aria-expanded="false"] {
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-  }
-
-  /* Let the tree itself scroll naturally inside the fixed panel instead of
-   * inheriting Quartz's desktop overflow constraints. */
-  .explorer .explorer-content > .explorer-ul,
-  .explorer .explorer-content .overflow {
+  /* Make the actual file list consume the fixed panel and scroll naturally. */
+  .explorer > .explorer-content > .explorer-ul {
+    width: 100% !important;
     max-height: none !important;
     overflow: visible !important;
   }
 
-  /* Mobile performance: no SVG refraction on any remaining rail/header card,
+  /* Mobile performance: no SVG refraction on remaining rail/header cards,
    * and no continuously rotating card rims. */
   .page-header,
   .page > #quartz-body > .sidebar.right > * {
@@ -191,12 +182,12 @@
     min-height: 54px !important;
   }
 
-  .explorer .explorer-content {
+  .explorer > .explorer-content {
     top: calc(10px + env(safe-area-inset-top, 0px)) !important;
     right: calc(10px + env(safe-area-inset-right, 0px)) !important;
-    bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important;
     left: calc(10px + env(safe-area-inset-left, 0px)) !important;
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important;
+    border-radius: 19px !important;
     padding: 16px 14px !important;
-    border-radius: 18px !important;
   }
 }
