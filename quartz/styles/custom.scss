@@ -4,6 +4,7 @@
 @use "./glass-polish.scss";
 @use "./ambient-background.scss";
 @use "./mobile-glass.scss";
+@use "./mobile-properties.scss";
 
 /* Ambient layers must remain renderable even if an older theme rule targets
  * body pseudo-elements. Their content/background is owned by ambient-background. */
