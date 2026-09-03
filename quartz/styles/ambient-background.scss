@@ -3,7 +3,7 @@
  *
  * The crisp artwork is always the real `body` background so every glass pane
  * samples one authoritative set of contour pixels. Desktop slowly pans the
- * image; mobile keeps it static for smooth scrolling.
+ * image; mobile now does the same at a gentler pace.
  */
 
 @keyframes deyotlan-topo-drift {
@@ -16,6 +16,19 @@
     background-position:
       0 0,
       50% 96%;
+  }
+}
+
+@keyframes deyotlan-topo-drift-mobile {
+  from {
+    background-position:
+      0 0,
+      50% 8%;
+  }
+  to {
+    background-position:
+      0 0,
+      50% 92%;
   }
 }
 
@@ -114,9 +127,10 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
 /*
  * MOBILE LIQUID-GLASS BACKDROP
  *
- * Keep the exact same compositing rule as desktop: the topo art stays directly
- * on body, never in a pseudo-element. The image is static and viewport-fixed,
- * so mobile glass can refract it without also repainting it every frame.
+ * Same compositing rule as desktop: the topo art is painted directly on body.
+ * The image is deliberately taller than the viewport so background-position
+ * has real travel on portrait phones, then it drifts much more slowly than on
+ * desktop to reduce repaint pressure.
  */
 @media all and (max-width: 800px) {
   body {
@@ -128,11 +142,17 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
         rgba(9, 7, 9, 0.54)
       ),
       url("/static/topo-bg.jpg") !important;
-    background-size: 100% 100%, cover !important;
+
+    background-size:
+      100% 100%,
+      auto 138vh !important;
     background-repeat: no-repeat, no-repeat !important;
-    background-position: 0 0, center center !important;
+    background-position:
+      0 0,
+      50% 8%;
     background-attachment: fixed, fixed !important;
-    animation: none !important;
+
+    animation: deyotlan-topo-drift-mobile 120s ease-in-out infinite alternate !important;
   }
 
   body::before,
