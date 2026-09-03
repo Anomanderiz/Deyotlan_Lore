@@ -21,22 +21,21 @@
 }
 
 /*
- * Mobile deliberately uses real viewport-length offsets rather than percentage
- * alignment. The topo sheet is 320dvh tall. Moving it from -60dvh to -160dvh
- * gives a full 100dvh of visible travel, while keeping at least 60dvh of image
- * beyond the viewport at both reversal points. Neither source-image edge can
- * enter the viewport during the animation.
+ * Mobile uses fixed viewport-length offsets rather than percentage alignment.
+ * The topo sheet is 500dvh tall and the visible viewport stays deep inside it.
+ * Moving between -150dvh and -250dvh gives a full 100dvh of travel while
+ * keeping both source-image edges far outside the visual viewport throughout.
  */
 @keyframes deyotlan-topo-drift-mobile {
   from {
     background-position:
       0 0,
-      50% -60dvh;
+      50% -150dvh;
   }
   to {
     background-position:
       0 0,
-      50% -160dvh;
+      50% -250dvh;
   }
 }
 
@@ -135,11 +134,11 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
 /*
  * MOBILE LIQUID-GLASS BACKDROP
  *
- * The square topo source is stretched into a 320dvh portrait sheet. The sheet
- * itself moves by a fixed 100dvh between -60dvh and -160dvh. This is not
- * edge-to-edge background alignment: the viewport remains deep inside the
- * oversized image throughout the entire oscillation, so the artwork can drift
- * down and back up for a long distance without ever revealing an image edge.
+ * The square topo source is stretched into a 500dvh portrait sheet. The
+ * viewport only sees an interior section of that sheet: the background moves
+ * a fixed 100dvh between -150dvh and -250dvh, then reverses. This leaves very
+ * large hidden buffers above and below at both reversal points so an image edge
+ * cannot enter the phone viewport, including while Safari chrome changes size.
  *
  * `html` mirrors the same synchronized field strictly as the root-canvas
  * fallback for iOS safe-area and rubber-band regions; `body` remains the actual
@@ -161,14 +160,14 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
 
     background-size:
       100% 100%,
-      100vw 320dvh !important;
+      100vw 500dvh !important;
     background-repeat: no-repeat, no-repeat !important;
     background-position:
       0 0,
-      50% -60dvh;
+      50% -150dvh;
     background-attachment: fixed, fixed !important;
 
-    animation: deyotlan-topo-drift-mobile 90s ease-in-out infinite alternate !important;
+    animation: deyotlan-topo-drift-mobile 35s ease-in-out infinite alternate !important;
   }
 
   body::before,
@@ -217,6 +216,6 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
     animation: none !important;
     background-position:
       0 0,
-      50% -110dvh !important;
+      50% -200dvh !important;
   }
 }
