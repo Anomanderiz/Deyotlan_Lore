@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "npm ci",
-  "buildCommand": "cp \"content/Deyotlan Lore/Deyotlan.md\" content/index.md && sed -i '2i title: Deyotlan' content/index.md && npx quartz plugin install --from-config && npx quartz build",
+  "buildCommand": "cp \"content/Five Banners Burning Campaign/Deyonahua/Deyotlan.md\" content/index.md && sed -i '2i title: Deyotlan' content/index.md && npx quartz plugin install --from-config && npx quartz build",
   "outputDirectory": "public",
   "cleanUrls": true,
   "trailingSlash": false
