@@ -1,0 +1,116 @@
+/*
+ * Liquid glass compositor.
+ *
+ * The successful reference architecture separates capture and distortion:
+ *   1. ::before captures the real moving backdrop with backdrop-filter.
+ *   2. ordinary filter:url(...) distorts that captured layer.
+ *   3. a translucent tint and the existing shine/rim sit above the optics.
+ *
+ * This deliberately runs only on larger screens. Mobile retains the lighter
+ * blur-only treatment from mobile-glass.scss/mobile-navigation.scss.
+ */
+
+@media all and (min-width: 801px) {
+  /* Major panes become wrappers rather than backdrop-filter targets. */
+  .page-header,
+  .page > #quartz-body > .sidebar.left,
+  .page > #quartz-body > .sidebar.right > * {
+    position: relative !important;
+    isolation: auto !important;
+
+    /* Kill the old URL-in-backdrop-filter experiment entirely. */
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+
+    /* Tint belongs to the liquid effect layer below, not the wrapper itself. */
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+
+    box-shadow:
+      inset 1px 1px 0 rgba(255, 255, 255, 0.24),
+      inset -1px -1px 0 rgba(255, 255, 255, 0.055),
+      0 18px 52px -24px var(--glass-shadow) !important;
+  }
+
+  /*
+   * Optical layer. This is the equivalent of the reference Pen's
+   * `.liquidGlass-effect`: capture first, then distort the captured pixels.
+   */
+  .page-header::before,
+  .page > #quartz-body > .sidebar.left::before,
+  .page > #quartz-body > .sidebar.right > *::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+    border-radius: inherit !important;
+    overflow: hidden !important;
+
+    /* A restrained Deyotlan/Fey tint, kept uniform so it does not read as noise. */
+    background:
+      linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.055),
+        transparent 34%,
+        color-mix(in srgb, var(--accent-primary) 4%, transparent) 100%
+      ),
+      color-mix(in srgb, var(--glass-fill) 44%, transparent) !important;
+
+    -webkit-backdrop-filter: blur(3px) saturate(155%) contrast(103%) !important;
+    backdrop-filter: blur(3px) saturate(155%) contrast(103%) !important;
+
+    /* Crucial difference from the failed experiment: ordinary filter here. */
+    filter: url("#deyotlan-liquid-distortion") !important;
+    isolation: isolate !important;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  /* Quartz content must paint above the optical layer. */
+  .page-header > *,
+  .page > #quartz-body > .sidebar.left > *,
+  .page > #quartz-body > .sidebar.right > * > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  /*
+   * Existing rotating conic rim remains, but it now lives above the wrapper
+   * edge instead of at negative z-index. Its mask means it never covers text.
+   */
+  .page-header::after,
+  .page > #quartz-body > .sidebar.left::after,
+  .page > #quartz-body > .sidebar.right > *::after {
+    z-index: 3 !important;
+  }
+
+  /* Light mode benefits from a slightly milkier lens. */
+  html[saved-theme="light"] .page-header::before,
+  html[saved-theme="light"] .page > #quartz-body > .sidebar.left::before,
+  html[saved-theme="light"] .page > #quartz-body > .sidebar.right > *::before {
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.18), transparent 42%),
+      color-mix(in srgb, var(--glass-fill) 52%, transparent) !important;
+  }
+}
+
+/* Never invoke the SVG distortion on phones/tablets. */
+@media all and (max-width: 800px) {
+  .page-header::before,
+  .page > #quartz-body > .sidebar.left::before,
+  .page > #quartz-body > .sidebar.right > *::before {
+    content: none !important;
+    display: none !important;
+    filter: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (min-width: 801px) {
+  .page-header::before,
+  .page > #quartz-body > .sidebar.left::before,
+  .page > #quartz-body > .sidebar.right > *::before {
+    filter: none !important;
+  }
+}
