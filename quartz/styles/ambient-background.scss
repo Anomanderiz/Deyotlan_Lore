@@ -1,12 +1,9 @@
 /*
  * Topographic atmosphere for the liquid-glass compositor.
  *
- * Desktop follows the working CodePen composition closely: the crisp moving
- * artwork is the actual `body` background. There is no duplicate procedural
- * line sheet, blend layer, or animated pseudo-element beneath the glass.
- *
- * Mobile keeps the same artwork but renders it as a static fixed layer because
- * SVG liquid distortion is disabled there and smooth scrolling matters more.
+ * The crisp artwork is always the real `body` background so every glass pane
+ * samples one authoritative set of contour pixels. Desktop slowly pans the
+ * image; mobile keeps it static for smooth scrolling.
  */
 
 @keyframes deyotlan-topo-drift {
@@ -31,11 +28,7 @@ html {
 
 /*
  * DESKTOP LIQUID-GLASS BACKDROP
- *
- * Layer 1 is only a translucent colour grade.
- * Layer 2 is the user's uploaded topographic artwork.
- * Both belong to the same body background painting; the glass therefore sees
- * one authoritative set of contour-line pixels.
+ * Layer 1 is a translucent colour grade; layer 2 is the uploaded topo art.
  */
 body {
   position: relative;
@@ -51,8 +44,6 @@ body {
     ),
     url("/static/topo-bg.jpg") !important;
 
-  /* Keep the grade viewport-sized while oversizing the square topo art enough
-   * to give background-position a large, smooth vertical travel range. */
   background-size:
     100% 100%,
     max(120vw, 1600px) auto !important;
@@ -65,7 +56,7 @@ body {
   animation: deyotlan-topo-drift 90s ease-in-out infinite alternate !important;
 }
 
-/* No legacy desktop background pseudo-layers. */
+/* No legacy background pseudo-layers. */
 body::before,
 body::after {
   content: none !important;
@@ -121,26 +112,15 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
 }
 
 /*
- * MOBILE
+ * MOBILE LIQUID-GLASS BACKDROP
  *
- * The expensive SVG glass compositor is already disabled below 801px. Use one
- * static viewport-fixed image layer here rather than animating the body
- * background while the user scrolls.
+ * Keep the exact same compositing rule as desktop: the topo art stays directly
+ * on body, never in a pseudo-element. The image is static and viewport-fixed,
+ * so mobile glass can refract it without also repainting it every frame.
  */
 @media all and (max-width: 800px) {
   body {
-    background: var(--surface-base) !important;
-    animation: none !important;
-  }
-
-  body::before {
-    content: "" !important;
-    display: block !important;
-    position: fixed !important;
-    inset: 0 !important;
-    z-index: 0 !important;
-    pointer-events: none !important;
-
+    background-color: var(--surface-base) !important;
     background-image:
       linear-gradient(
         145deg,
@@ -148,21 +128,20 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
         rgba(9, 7, 9, 0.54)
       ),
       url("/static/topo-bg.jpg") !important;
-    background-size: cover, cover !important;
+    background-size: 100% 100%, cover !important;
     background-repeat: no-repeat, no-repeat !important;
-    background-position: center, center !important;
-
-    filter: none !important;
+    background-position: 0 0, center center !important;
+    background-attachment: fixed, fixed !important;
     animation: none !important;
-    mix-blend-mode: normal !important;
   }
 
+  body::before,
   body::after {
     content: none !important;
     display: none !important;
   }
 
-  html[saved-theme="light"] body::before {
+  html[saved-theme="light"] body {
     background-image:
       linear-gradient(
         145deg,
@@ -172,12 +151,22 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
       url("/static/topo-bg.jpg") !important;
   }
 
-  html:has(a.tag-link[href*="tags/fey"]) body::before {
+  html:has(a.tag-link[href*="tags/fey"]) body {
     background-image:
       linear-gradient(
         145deg,
         rgba(49, 37, 67, 0.30),
         rgba(27, 43, 31, 0.40)
+      ),
+      url("/static/topo-bg.jpg") !important;
+  }
+
+  html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
+    background-image:
+      linear-gradient(
+        145deg,
+        rgba(229, 224, 240, 0.26),
+        rgba(224, 235, 217, 0.22)
       ),
       url("/static/topo-bg.jpg") !important;
   }
