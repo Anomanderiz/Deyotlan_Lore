@@ -6,6 +6,7 @@
 @use "./mobile-glass.scss";
 @use "./mobile-properties.scss";
 @use "./mobile-navigation.scss";
+@use "./liquid-glass.scss";
 
 /* Ambient layers must remain renderable even if an older theme rule targets
  * body pseudo-elements. Their content/background is owned by ambient-background. */
