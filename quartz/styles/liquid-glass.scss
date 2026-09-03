@@ -16,12 +16,16 @@
  */
 article
   .markdown-preview-view
-  > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(:has(> video:only-child)) {
+  > :is(
+    p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(:has(> video:only-child)),
+    ul,
+    ol
+  ) {
   position: relative;
   isolation: isolate;
   overflow: hidden;
   margin: 1rem 0;
-  padding: 0.85rem 1rem;
+  padding: var(--liquid-glass-padding, 0.85rem 1rem);
   border: 0;
   border-radius: 16px;
   background: transparent;
@@ -34,15 +38,23 @@ article
     box-shadow 180ms ease;
 }
 
+article .markdown-preview-view > :is(ul, ol) {
+  --liquid-glass-padding: 0.85rem 1rem 0.85rem 2.35rem;
+}
+
 article
   .markdown-preview-view
-  > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(
-    :has(> video:only-child)
+  > :is(
+    p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(:has(> video:only-child)),
+    ul,
+    ol
   )::before,
 article
   .markdown-preview-view
-  > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(
-    :has(> video:only-child)
+  > :is(
+    p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(:has(> video:only-child)),
+    ul,
+    ol
   )::after {
   content: "";
   position: absolute;
@@ -53,8 +65,10 @@ article
 
 article
   .markdown-preview-view
-  > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(
-    :has(> video:only-child)
+  > :is(
+    p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(:has(> video:only-child)),
+    ul,
+    ol
   )::before {
   z-index: -2;
   overflow: hidden;
@@ -66,8 +80,10 @@ article
 
 article
   .markdown-preview-view
-  > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(
-    :has(> video:only-child)
+  > :is(
+    p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(:has(> video:only-child)),
+    ul,
+    ol
   )::after {
   z-index: -1;
   background: color-mix(in srgb, var(--glass-fill) 48%, transparent);
@@ -78,8 +94,10 @@ article
 
 article
   .markdown-preview-view
-  > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(
-    :has(> video:only-child)
+  > :is(
+    p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(:has(> video:only-child)),
+    ul,
+    ol
   ):hover {
   transform: translateY(-1px);
   box-shadow:
@@ -161,8 +179,10 @@ article
 
   article
     .markdown-preview-view
-    > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(
-      :has(> video:only-child)
+    > :is(
+      p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(:has(> video:only-child)),
+      ul,
+      ol
     )::before {
     -webkit-backdrop-filter: blur(3px) saturate(155%) contrast(103%);
     backdrop-filter: blur(3px) saturate(155%) contrast(103%);
@@ -264,16 +284,31 @@ article
 
   article
     .markdown-preview-view
-    > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(:has(> video:only-child)) {
+    > :is(
+      p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(:has(> video:only-child)),
+      ul,
+      ol
+    ) {
     margin: 0.75rem 0;
-    padding: 0.72rem 0.82rem;
     border-radius: 14px;
   }
 
   article
     .markdown-preview-view
-    > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(
-      :has(> video:only-child)
+    > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(:has(> video:only-child)) {
+    --liquid-glass-padding: 0.72rem 0.82rem;
+  }
+
+  article .markdown-preview-view > :is(ul, ol) {
+    --liquid-glass-padding: 0.72rem 0.82rem 0.72rem 2.15rem;
+  }
+
+  article
+    .markdown-preview-view
+    > :is(
+      p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(:has(> video:only-child)),
+      ul,
+      ol
     )::before {
     -webkit-backdrop-filter: blur(2px) saturate(145%) contrast(102%);
     backdrop-filter: blur(2px) saturate(145%) contrast(102%);
@@ -287,8 +322,10 @@ article
   .page > #quartz-body > .sidebar.right > *::before,
   article
     .markdown-preview-view
-    > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(
-      :has(> video:only-child)
+    > :is(
+      p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(:has(> video:only-child)),
+      ul,
+      ol
     )::before {
     filter: none !important;
   }
