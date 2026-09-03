@@ -128,9 +128,11 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
  * MOBILE LIQUID-GLASS BACKDROP
  *
  * Same compositing rule as desktop: the topo art is painted directly on body.
- * The image is deliberately taller than the viewport so background-position
- * has real travel on portrait phones. `html` mirrors the same field strictly
- * as the root-canvas fallback for iOS safe-area and rubber-band regions.
+ * Unlike desktop, the square source artwork is deliberately stretched to the
+ * phone viewport width rather than preserving its aspect ratio. A small amount
+ * of extra vertical height remains so the slow topo drift still has room to
+ * move. `html` mirrors the same field strictly as the root-canvas fallback for
+ * iOS safe-area and rubber-band regions.
  */
 @media all and (max-width: 800px) {
   html,
@@ -148,7 +150,7 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
 
     background-size:
       100% 100%,
-      auto 138dvh !important;
+      100vw 118dvh !important;
     background-repeat: no-repeat, no-repeat !important;
     background-position:
       0 0,
