@@ -24,9 +24,12 @@ export const DefaultFrame: PageFrame = {
     return (
       <>
         {/*
-         * Hidden SVG reference filter for the live-glass diagnostic.
-         * Deliberately exaggerated: if Chromium applies the SVG URL filter to
-         * backdrop-filter, moving background lines should kink dramatically.
+         * Liquid-glass displacement map.
+         *
+         * Based on the successful CodePen architecture: a CSS layer first
+         * captures the real backdrop with backdrop-filter, then this ordinary
+         * SVG filter distorts that captured layer. The Gaussian-blurred noise
+         * produces broad, lens-like warping instead of granular texture.
          */}
         <svg
           class="deyotlan-glass-filter-defs"
@@ -37,25 +40,26 @@ export const DefaultFrame: PageFrame = {
         >
           <defs>
             <filter
-              id="deyotlan-glass-refraction"
-              x="-40%"
-              y="-40%"
-              width="180%"
-              height="180%"
+              id="deyotlan-liquid-distortion"
+              x="0%"
+              y="0%"
+              width="100%"
+              height="100%"
+              filterUnits="objectBoundingBox"
               color-interpolation-filters="sRGB"
             >
               <feTurbulence
                 type="fractalNoise"
-                baseFrequency="0.012 0.032"
-                numOctaves="2"
-                seed="11"
-                stitchTiles="stitch"
-                result="glassNoise"
+                baseFrequency="0.01 0.01"
+                numOctaves="1"
+                seed="5"
+                result="turbulence"
               />
+              <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
               <feDisplacementMap
                 in="SourceGraphic"
-                in2="glassNoise"
-                scale="100"
+                in2="softMap"
+                scale="64"
                 xChannelSelector="R"
                 yChannelSelector="G"
               />
