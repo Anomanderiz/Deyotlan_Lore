@@ -92,9 +92,23 @@
    * Only the large surfaces get SVG refraction. Small toolbar buttons retain
    * accelerated blur from the mobile styles to keep scrolling/taps responsive.
    */
-  .page-header,
-  .explorer > .explorer-content {
+  .page-header {
     position: relative !important;
+    isolation: auto !important;
+
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+
+  /*
+   * IMPORTANT: do not set position here. mobile-navigation.scss owns the
+   * drawer geometry with position:fixed. Overriding it breaks the FAB/drawer.
+   */
+  .explorer > .explorer-content {
     isolation: auto !important;
 
     -webkit-backdrop-filter: none !important;
