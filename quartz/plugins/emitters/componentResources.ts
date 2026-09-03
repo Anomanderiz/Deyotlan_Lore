@@ -6,6 +6,8 @@ import { QuartzEmitterPlugin } from "../types"
 import spaRouterScript from "../../components/scripts/spa.inline"
 // @ts-ignore
 import popoverScript from "../../components/scripts/popover.inline"
+// @ts-ignore
+import explorerDefaultsScript from "../../components/scripts/explorer-defaults.inline"
 import baseStyles from "../../styles/base.scss"
 import customStyles from "../../styles/custom.scss"
 import popoverStyle from "../../components/styles/popover.scss"
@@ -83,6 +85,10 @@ async function joinScripts(scripts: string[]): Promise<string> {
 
 function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentResources) {
   const cfg = ctx.cfg.configuration
+
+  // The community explorer currently renders these configuration values as
+  // data attributes but does not apply them when it rebuilds the client tree.
+  componentResources.afterDOMLoaded.push(explorerDefaultsScript)
 
   // popovers
   if (cfg.enablePopovers) {
