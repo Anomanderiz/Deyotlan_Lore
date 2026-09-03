@@ -14,3 +14,9 @@ body::before,
 body::after {
   display: block !important;
 }
+
+/* This folder has a hand-authored campaign index, so the generated folder
+ * count and duplicate subfolder listing are redundant. */
+body[data-slug="five-banners-burning-campaign/index"] .page-listing {
+  display: none;
+}
