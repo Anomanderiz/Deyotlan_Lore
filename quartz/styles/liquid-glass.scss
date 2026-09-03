@@ -6,9 +6,86 @@
  *   2. ordinary filter:url(...) distorts that captured layer.
  *   3. translucent tint / rim / content sit above the optics.
  *
- * Desktop uses the stronger displacement map. Mobile uses a gentler map and
- * only applies it to the two large glass surfaces: header and navigation drawer.
+ * Desktop uses the stronger displacement map. Mobile uses a gentler map.
  */
+
+/*
+ * Prose liquid glass follows the reference implementation's four layers:
+ * wrapper -> displaced backdrop (::before) -> tint/shine (::after) -> text.
+ * Image-only blocks stay outside the treatment.
+ */
+article
+  .markdown-preview-view
+  > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(:has(> video:only-child)) {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin: 1rem 0;
+  padding: 0.85rem 1rem;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  line-height: 1.65;
+  box-shadow:
+    0 6px 6px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+article
+  .markdown-preview-view
+  > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(
+    :has(> video:only-child)
+  )::before,
+article
+  .markdown-preview-view
+  > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(
+    :has(> video:only-child)
+  )::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+article
+  .markdown-preview-view
+  > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(
+    :has(> video:only-child)
+  )::before {
+  z-index: -2;
+  overflow: hidden;
+  isolation: isolate;
+  background: rgba(255, 255, 255, 0.01);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+article
+  .markdown-preview-view
+  > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(
+    :has(> video:only-child)
+  )::after {
+  z-index: -1;
+  background: color-mix(in srgb, var(--glass-fill) 48%, transparent);
+  box-shadow:
+    inset 2px 2px 1px 0 rgba(255, 255, 255, 0.28),
+    inset -1px -1px 1px 1px rgba(255, 255, 255, 0.12);
+}
+
+article
+  .markdown-preview-view
+  > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(
+    :has(> video:only-child)
+  ):hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 9px 10px rgba(0, 0, 0, 0.22),
+    0 0 24px color-mix(in srgb, var(--accent-primary) 10%, transparent);
+}
 
 @media all and (min-width: 801px) {
   /* Major panes become wrappers rather than backdrop-filter targets. */
@@ -80,6 +157,16 @@
     background:
       linear-gradient(145deg, rgba(255, 255, 255, 0.18), transparent 42%),
       color-mix(in srgb, var(--glass-fill) 52%, transparent) !important;
+  }
+
+  article
+    .markdown-preview-view
+    > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(
+      :has(> video:only-child)
+    )::before {
+    -webkit-backdrop-filter: blur(3px) saturate(155%) contrast(103%);
+    backdrop-filter: blur(3px) saturate(155%) contrast(103%);
+    filter: url("#deyotlan-liquid-distortion");
   }
 }
 
@@ -174,12 +261,35 @@
       linear-gradient(145deg, rgba(255, 255, 255, 0.19), transparent 44%),
       color-mix(in srgb, var(--glass-fill) 54%, transparent) !important;
   }
+
+  article
+    .markdown-preview-view
+    > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(:has(> video:only-child)) {
+    margin: 0.75rem 0;
+    padding: 0.72rem 0.82rem;
+    border-radius: 14px;
+  }
+
+  article
+    .markdown-preview-view
+    > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(
+      :has(> video:only-child)
+    )::before {
+    -webkit-backdrop-filter: blur(2px) saturate(145%) contrast(102%);
+    backdrop-filter: blur(2px) saturate(145%) contrast(102%);
+    filter: url("#deyotlan-liquid-distortion-mobile");
+  }
 }
 
 @media (prefers-reduced-motion: reduce) and (min-width: 801px) {
   .page-header::before,
   .page > #quartz-body > .sidebar.left::before,
-  .page > #quartz-body > .sidebar.right > *::before {
+  .page > #quartz-body > .sidebar.right > *::before,
+  article
+    .markdown-preview-view
+    > p:not(:has(> img:only-child)):not(:has(> picture:only-child)):not(
+      :has(> video:only-child)
+    )::before {
     filter: none !important;
   }
 }
