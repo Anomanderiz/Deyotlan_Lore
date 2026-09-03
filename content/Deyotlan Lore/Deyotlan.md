@@ -4,7 +4,7 @@ aliases:
   - The Solar Empire
   - Realm of the Sun
 created: 2026-08-31T23:43:24.426Z
-modified: 2026-09-02T17:55:01.029Z
+modified: 2026-09-03T05:48:27.152Z
 tags:
   - lore
   - nation
@@ -99,7 +99,7 @@ In the past, when enemies have come from the sea, the fey have lifted the veils 
 
 Similarly, when plague enters a dwarven city, those who warn their children about fairy witches carry those same children into the forest by night, to be touched by one of the Eeshee ('People of the Grave Mounds, in _sheerack_) and so be cured.
 
-Crucially, the discovery of potion-making by dwarves from the House of the Eagle at Tlecalco, created an economic interdependence between the fey and the dwarves. The prized fruits that are used in the making of these arcane concoctions only grow in the mystical Forest of Shadows. The potion trade brings in enormous wealth to the dwarves, who in turn raise vast armies to protect the Forest from would-be invaders.
+Crucially, the discovery of potion-making by dwarves from the House of the Eagle at Tlecalco, created an economic interdependence between the fey and the dwarves. The prized [[quizgode]] fruits that are used in the making of these arcane concoctions only grow in the mystical Forest of Shadows. The potion trade brings in enormous wealth to the dwarves, who in turn raise vast armies to protect the Forest from would-be invaders.
 
 Neither people is comfortable admitting how sorely it needs the other. They fear one another, resent one another and misunderstand one another, but they also recognise – deep in their hearts – that they know one another better than either knows any foreign power.
 
