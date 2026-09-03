@@ -129,11 +129,14 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
  *
  * Same compositing rule as desktop: the topo art is painted directly on body.
  * The image is deliberately taller than the viewport so background-position
- * has real travel on portrait phones, then it drifts much more slowly than on
- * desktop to reduce repaint pressure.
+ * has real travel on portrait phones. `html` mirrors the same field strictly
+ * as the root-canvas fallback for iOS safe-area and rubber-band regions.
  */
 @media all and (max-width: 800px) {
+  html,
   body {
+    min-height: 100%;
+    min-height: 100dvh;
     background-color: var(--surface-base) !important;
     background-image:
       linear-gradient(
@@ -145,7 +148,7 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
 
     background-size:
       100% 100%,
-      auto 138vh !important;
+      auto 138dvh !important;
     background-repeat: no-repeat, no-repeat !important;
     background-position:
       0 0,
@@ -161,6 +164,7 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
     display: none !important;
   }
 
+  html[saved-theme="light"],
   html[saved-theme="light"] body {
     background-image:
       linear-gradient(
@@ -171,6 +175,7 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
       url("/static/topo-bg.jpg") !important;
   }
 
+  html:has(a.tag-link[href*="tags/fey"]),
   html:has(a.tag-link[href*="tags/fey"]) body {
     background-image:
       linear-gradient(
@@ -181,6 +186,7 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
       url("/static/topo-bg.jpg") !important;
   }
 
+  html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]),
   html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
     background-image:
       linear-gradient(
@@ -193,6 +199,7 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html,
   body {
     animation: none !important;
     background-position:
