@@ -1,18 +1,28 @@
 /*
  * Moving ambient field behind the glass.
  *
- * The stripe field is viewport-anchored and animated by background-position.
- * Major glass panes render the same field internally, using the same timing,
- * so a stripe reaches the pane boundary at the same place before being
- * optically displaced inside the pane.
+ * Important compositing rule: the crisp diagonal stripe field is part of the
+ * actual body background, just like the working liquid-glass reference Pen.
+ * It must NOT live in a separate pseudo-element / blend layer, otherwise
+ * Chromium can show the untouched stripe sheet beneath a distorted copy.
  */
 
 @keyframes deyotlan-line-scroll {
   from {
-    background-position: 0 0;
+    background-position:
+      0 0,
+      0 0,
+      0 0,
+      0 0,
+      0 0;
   }
   to {
-    background-position: 33.941125px 33.941125px;
+    background-position:
+      33.941125px 33.941125px,
+      0 0,
+      0 0,
+      0 0,
+      0 0;
   }
 }
 
@@ -32,12 +42,22 @@
 
 body {
   position: relative;
-  isolation: isolate;
   overflow-x: hidden;
   min-height: 100vh;
 
+  /*
+   * Layer 1 is the moving 48px stripe field. The other four layers stay fixed
+   * in background-position while layer 1 advances by exactly one stripe period.
+   * Because this is the real background rather than a composited child layer,
+   * backdrop capture has only one set of stripe pixels to work with.
+   */
   background-color: var(--surface-base) !important;
   background-image:
+    repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--accent-secondary) 11%, transparent) 0 1px,
+      transparent 1px 48px
+    ),
     radial-gradient(
       58rem 42rem at 12% 8%,
       color-mix(in srgb, var(--accent-primary) 24%, transparent),
@@ -54,39 +74,31 @@ body {
       transparent 72%
     ),
     linear-gradient(145deg, var(--surface-base), var(--surface-deep)) !important;
+
+  background-position:
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0;
   background-attachment: fixed;
-}
-
-/*
- * One viewport-locked stripe sheet. This uses the same 48px-period motion as
- * the refracted copies inside the panes. A 33.941125px X/Y shift advances a
- * 135deg field by exactly one 48px stripe period, making the loop seamless.
- */
-body::before {
-  content: "" !important;
-  display: block !important;
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 0 !important;
-  pointer-events: none !important;
-
-  background-image: repeating-linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--accent-secondary) 22%, rgba(255, 255, 255, 0.14)) 0 1px,
-    transparent 1px 48px
-  ) !important;
-  background-attachment: fixed !important;
-  background-position: 0 0;
-
-  opacity: 0.34 !important;
-  filter: none !important;
-  mix-blend-mode: screen;
-  backface-visibility: hidden;
-  will-change: background-position;
   animation: deyotlan-line-scroll 14s linear infinite !important;
 }
 
-/* Large blurred colour masses move independently behind the line field. */
+/*
+ * Explicitly retire the old stripe/noise pseudo-element from earlier passes.
+ * `content: none` wins even though custom.scss keeps pseudo-elements displayable.
+ */
+body::before {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  animation: none !important;
+  mix-blend-mode: normal !important;
+}
+
+/* Large blurred colour masses may remain a separate soft layer because they do
+ * not contain crisp geometry whose duplicate would reveal the compositor. */
 body::after {
   content: "" !important;
   display: block !important;
@@ -130,13 +142,33 @@ body::after {
   background: transparent !important;
 }
 
-html[saved-theme="light"] body::before {
-  opacity: 0.20 !important;
-  mix-blend-mode: multiply;
+/* Slightly quieter lines in light mode. */
+html[saved-theme="light"] body {
+  background-image:
+    repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--accent-secondary) 8%, transparent) 0 1px,
+      transparent 1px 48px
+    ),
+    radial-gradient(
+      58rem 42rem at 12% 8%,
+      color-mix(in srgb, var(--accent-primary) 24%, transparent),
+      transparent 67%
+    ),
+    radial-gradient(
+      48rem 38rem at 92% 18%,
+      color-mix(in srgb, var(--accent-secondary) 18%, transparent),
+      transparent 69%
+    ),
+    radial-gradient(
+      52rem 42rem at 58% 96%,
+      color-mix(in srgb, var(--accent-primary) 12%, var(--accent-secondary) 6%, transparent),
+      transparent 72%
+    ),
+    linear-gradient(145deg, var(--surface-base), var(--surface-deep)) !important;
 }
 
-html:has(a.tag-link[href*="tags/fey"]) body::before {
-  opacity: 0.25 !important;
+html:has(a.tag-link[href*="tags/fey"]) body {
   animation-duration: 18s !important;
 }
 
@@ -146,7 +178,6 @@ html:has(a.tag-link[href*="tags/fey"]) body::after {
 }
 
 @media all and (max-width: 800px) {
-  body::before { opacity: 0.25 !important; }
   body::after {
     opacity: 0.72 !important;
     filter: blur(56px) saturate(110%) !important;
@@ -154,7 +185,7 @@ html:has(a.tag-link[href*="tags/fey"]) body::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body::before,
+  body,
   body::after {
     animation: none !important;
   }
