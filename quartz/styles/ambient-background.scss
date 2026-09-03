@@ -4,7 +4,7 @@
  * The crisp artwork is always the real `body` background so every glass pane
  * samples one authoritative set of contour pixels. Desktop slowly pans the
  * image; mobile uses the same ease-in-out alternate motion over a deliberately
- * oversized portrait-stretched topo sheet, while never approaching its edges.
+ * oversized portrait-stretched topo sheet.
  */
 
 @keyframes deyotlan-topo-drift {
@@ -20,16 +20,23 @@
   }
 }
 
+/*
+ * Mobile deliberately uses real viewport-length offsets rather than percentage
+ * alignment. The topo sheet is 320dvh tall. Moving it from -60dvh to -160dvh
+ * gives a full 100dvh of visible travel, while keeping at least 60dvh of image
+ * beyond the viewport at both reversal points. Neither source-image edge can
+ * enter the viewport during the animation.
+ */
 @keyframes deyotlan-topo-drift-mobile {
   from {
     background-position:
       0 0,
-      50% 15%;
+      50% -60dvh;
   }
   to {
     background-position:
       0 0,
-      50% 85%;
+      50% -160dvh;
   }
 }
 
@@ -128,13 +135,11 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
 /*
  * MOBILE LIQUID-GLASS BACKDROP
  *
- * The square topo source is intentionally stretched into a very long portrait
- * sheet: full viewport width and 260% of the dynamic viewport height. The
- * animation only travels through the interior 15%-85% of that sheet instead
- * of ever aligning either image edge with the viewport. This produces a long
- * to-and-fro drift while leaving roughly 24dvh of hidden image buffer beyond
- * the viewport at each reversal point, protecting against iOS visual-viewport
- * changes and keeping the image boundary permanently off-screen.
+ * The square topo source is stretched into a 320dvh portrait sheet. The sheet
+ * itself moves by a fixed 100dvh between -60dvh and -160dvh. This is not
+ * edge-to-edge background alignment: the viewport remains deep inside the
+ * oversized image throughout the entire oscillation, so the artwork can drift
+ * down and back up for a long distance without ever revealing an image edge.
  *
  * `html` mirrors the same synchronized field strictly as the root-canvas
  * fallback for iOS safe-area and rubber-band regions; `body` remains the actual
@@ -156,11 +161,11 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
 
     background-size:
       100% 100%,
-      100vw 260dvh !important;
+      100vw 320dvh !important;
     background-repeat: no-repeat, no-repeat !important;
     background-position:
       0 0,
-      50% 15%;
+      50% -60dvh;
     background-attachment: fixed, fixed !important;
 
     animation: deyotlan-topo-drift-mobile 90s ease-in-out infinite alternate !important;
@@ -212,6 +217,6 @@ html[saved-theme="light"]:has(a.tag-link[href*="tags/fey"]) body {
     animation: none !important;
     background-position:
       0 0,
-      50% 50% !important;
+      50% -110dvh !important;
   }
 }
