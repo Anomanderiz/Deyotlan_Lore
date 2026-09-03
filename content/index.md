@@ -1,5 +1,6 @@
 ---
-title: Deyotlan Lore
+title: Five Banners Burning Campaign
+publish: true
 ---
 
-Welcome to the Deyotlan lore archive.
+Continue to the [[Five Banners Burning Campaign/index|Five Banners Burning Campaign index]].
