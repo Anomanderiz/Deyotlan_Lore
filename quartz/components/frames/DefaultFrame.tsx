@@ -24,12 +24,12 @@ export const DefaultFrame: PageFrame = {
     return (
       <>
         {/*
-         * Liquid-glass displacement map.
+         * Liquid-glass displacement maps.
          *
-         * Based on the successful CodePen architecture: a CSS layer first
-         * captures the real backdrop with backdrop-filter, then this ordinary
-         * SVG filter distorts that captured layer. The Gaussian-blurred noise
-         * produces broad, lens-like warping instead of granular texture.
+         * CSS first captures the real backdrop with backdrop-filter, then an
+         * ordinary SVG filter distorts that captured layer. Desktop uses the
+         * stronger lens; phones use a gentler map to reduce GPU cost and avoid
+         * over-warping small controls.
          */}
         <svg
           class="deyotlan-glass-filter-defs"
@@ -60,6 +60,32 @@ export const DefaultFrame: PageFrame = {
                 in="SourceGraphic"
                 in2="softMap"
                 scale="64"
+                xChannelSelector="R"
+                yChannelSelector="G"
+              />
+            </filter>
+
+            <filter
+              id="deyotlan-liquid-distortion-mobile"
+              x="0%"
+              y="0%"
+              width="100%"
+              height="100%"
+              filterUnits="objectBoundingBox"
+              color-interpolation-filters="sRGB"
+            >
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.012 0.012"
+                numOctaves="1"
+                seed="5"
+                result="mobileTurbulence"
+              />
+              <feGaussianBlur in="mobileTurbulence" stdDeviation="2.5" result="mobileSoftMap" />
+              <feDisplacementMap
+                in="SourceGraphic"
+                in2="mobileSoftMap"
+                scale="34"
                 xChannelSelector="R"
                 yChannelSelector="G"
               />
