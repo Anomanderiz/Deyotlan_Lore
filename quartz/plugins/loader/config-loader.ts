@@ -497,6 +497,8 @@ export async function loadQuartzConfig(
     builtinPlugins.ComponentResources(),
     builtinPlugins.Assets(),
     builtinPlugins.Static(),
+    // DEYOTLAN: emits the /admin surface and static/build-info.json
+    builtinPlugins.AdminPages(),
   ]
   const builtinPageTypes = [builtinPlugins.PageTypes.NotFoundPageType()]
 
@@ -647,7 +649,33 @@ export async function loadQuartzLayout(layoutOverrides?: {
     return oldLayout.layout
   }
 
-  const enabledWithLayout = json.plugins.filter((e) => e.enabled)
+  // DEYOTLAN: first-party components are not npm plugins, so they are registered
+  // directly and placed with synthetic layout entries. `extractPluginName` returns a
+  // bare string source unchanged, so "wiki-nav" resolves through componentRegistry.
+  //
+  // Imported here rather than at module scope on purpose: those components import
+  // .scss, which the esbuild pipeline handles but a plain `tsx` process cannot. A
+  // top-level import would break config-loader.test.ts, which only ever exercises
+  // buildLayoutForEntries.
+  const { registerLocalComponents } = await import("../../components/wiki/register")
+  registerLocalComponents()
+  const localEntries: PluginJsonEntry[] = [
+    {
+      source: "wiki-nav",
+      enabled: true,
+      // Matches the slot the community explorer occupied, preserving its order
+      // relative to search (20), spacer (25) and darkmode (30).
+      layout: { position: "left", priority: 50 },
+    },
+    {
+      source: "wiki-tags",
+      enabled: true,
+      // Above backlinks (50), below the table of contents (30).
+      layout: { position: "right", priority: 40 },
+    },
+  ]
+
+  const enabledWithLayout = [...json.plugins.filter((e) => e.enabled), ...localEntries]
   const layoutConfig = json.layout ?? {}
 
   // Build default layout for all page types

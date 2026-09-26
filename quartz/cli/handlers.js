@@ -13,6 +13,8 @@ import http from "http"
 import serveHandler from "serve-handler"
 import { WebSocketServer } from "ws"
 import { randomUUID } from "crypto"
+// DEYOTLAN: used by the /api dev bridge below
+import { pathToFileURL } from "url"
 import { Mutex } from "async-mutex"
 import { CreateArgv } from "./args.js"
 import { globby } from "globby"
@@ -468,6 +470,35 @@ export async function handleBuild(argv) {
 
       // strip baseDir prefix
       req.url = req.url?.slice(argv.baseDir.length)
+
+      // DEYOTLAN: dispatch /api/* to the same handler files Vercel runs in production.
+      // This works only because those handlers are written against raw Node (req, res)
+      // with no Vercel-specific sugar, so there is no shim to reimplement here. The
+      // mtime cache-buster hot-reloads function code without restarting the server.
+      const apiPath = (req.url ?? "").split("?")[0]
+      if (apiPath.startsWith("/api/")) {
+        const rel = apiPath.slice(5).replace(/[^a-zA-Z0-9/_-]/g, "")
+        const apiRoot = path.resolve(process.cwd(), "api")
+        const file = path.resolve(apiRoot, rel + ".js")
+        if (!file.startsWith(apiRoot + path.sep) || !fs.existsSync(file)) {
+          res.writeHead(404, { "Content-Type": "application/json" })
+          res.end(JSON.stringify({ error: "not_found", message: `No API route ${apiPath}` }))
+          return
+        }
+        try {
+          const mod = await import(pathToFileURL(file).href + "?t=" + fs.statSync(file).mtimeMs)
+          await mod.default(req, res)
+        } catch (err) {
+          console.error(styleText("red", `[api] ${apiPath} failed:`), err)
+          if (!res.headersSent) {
+            res.writeHead(500, { "Content-Type": "application/json" })
+            res.end(JSON.stringify({ error: "internal", message: String(err) }))
+          } else {
+            res.end()
+          }
+        }
+        return
+      }
 
       const serve = async () => {
         const release = await buildMutex.acquire()

@@ -157,8 +157,12 @@ plugins:
     enabled: true
   - source: "@quartz-community/tag-page"
     enabled: true
+  # DEYOTLAN: replaced by the first-party WikiNav component, which renders curated
+  # groups from quartz/static/nav.json instead of the folder tree. Disabling it here
+  # removes both its layout slot and its injected client script. WikiNav is placed in
+  # the layout by a synthetic entry in config-loader.ts (see docs/FORK-PATCHES.md).
   - source: "@quartz-community/explorer"
-    enabled: true
+    enabled: false
     options:
       folderDefaultState: open
       useSavedState: false
@@ -298,8 +302,12 @@ plugins:
       position: beforeBody
       priority: 15
       display: all
+  # DEYOTLAN: disabled — this package is in neither package.json nor node_modules,
+  # and no content file uses Excalidraw. It resolved only via `quartz plugin install
+  # --from-config` on Vercel, so any npm hiccup failed every production build.
+  # Re-enable only after adding it to package.json with a pinned version.
   - source: "@quartz-community/obsidian-plugin-excalidraw"
-    enabled: true
+    enabled: false
     options:
       enableInteraction: true
       darkMode: auto

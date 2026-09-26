@@ -1,0 +1,195 @@
+/*
+ * Additive styles for the curated wiki navigation.
+ *
+ * Most of the nav's appearance comes from the existing theme, which targets the
+ * explorer DOM that WikiNav reproduces exactly. Only the genuinely new affordances
+ * belong here, so the two stay in sync by construction rather than by duplication.
+ */
+
+.wiki-nav .folder-title {
+  /* Group labels are curated headings rather than folder names. */
+  letter-spacing: 0.02em;
+}
+
+.wiki-nav .explorer-ul a.active,
+.wiki-nav .explorer-ul a.is-active {
+  opacity: 1;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Drag affordances — only ever rendered for an authenticated admin           */
+/* -------------------------------------------------------------------------- */
+
+.wiki-nav:not(.is-admin) .drag-grip {
+  display: none;
+}
+
+.wiki-nav .explorer-ul li:has(> a) {
+  position: relative;
+}
+
+.wiki-nav.is-admin .explorer-ul li:has(> a) {
+  /* Room for the grip without shifting the label. */
+  padding-left: 1.5rem;
+}
+
+.wiki-nav .drag-grip {
+  position: absolute;
+  left: -0.35rem;
+  top: 50%;
+  transform: translateY(-50%);
+
+  /* 44x44 is the minimum comfortable touch target, and this is aimed at a phone.
+     The glyph inside is small; the hit area is not. */
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: grab;
+  color: var(--gray);
+  opacity: 0;
+  font-size: 0.85rem;
+  line-height: 1;
+
+  /* Only the grip opts out of native gestures, so the list still scrolls when the
+     user drags anywhere else. */
+  touch-action: none;
+  transition: opacity 0.15s ease;
+}
+
+.wiki-nav .drag-grip:active {
+  cursor: grabbing;
+}
+
+.wiki-nav.is-admin .explorer-ul li:hover > .drag-grip,
+.wiki-nav .drag-grip:focus-visible,
+.wiki-nav .drag-grip[aria-pressed="true"] {
+  opacity: 1;
+}
+
+/* On touch there is no hover, so the grips are always faintly visible. */
+@media (hover: none) {
+  .wiki-nav.is-admin .drag-grip {
+    opacity: 0.55;
+  }
+}
+
+.wiki-nav .drag-grip:focus-visible {
+  outline: 2px solid var(--tertiary);
+  outline-offset: -6px;
+  border-radius: 8px;
+}
+
+.wiki-nav li.is-dragging {
+  opacity: 0.35;
+}
+
+.wiki-nav li.is-keyboard-dragging {
+  outline: 2px dashed var(--tertiary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+li.drag-ghost {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 1.5rem;
+  border-radius: 10px;
+  background: var(--light);
+  border: 1px solid var(--tertiary);
+  box-shadow: 0 12px 28px -14px rgba(0, 0, 0, 0.6);
+  opacity: 0.94;
+  transform: rotate(-0.4deg);
+}
+
+.drop-indicator {
+  height: 2px;
+  margin: 1px 0;
+  border-radius: 2px;
+  background: var(--tertiary);
+  box-shadow: 0 0 6px var(--tertiary);
+}
+
+/* Suppress hover feedback mid-drag so the pointer does not appear to be over
+   two rows at once. */
+.wiki-nav.is-dragging-active .explorer-ul a:hover {
+  color: inherit;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Unsaved-changes bar                                                        */
+/* -------------------------------------------------------------------------- */
+
+.wiki-nav-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.6rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 10px;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  font-size: 0.78rem;
+  color: var(--darkgray);
+}
+
+.wiki-nav-status[hidden] {
+  display: none;
+}
+
+.wiki-nav-status[data-kind="pending"] {
+  border-color: var(--tertiary);
+}
+
+.wiki-nav-status[data-kind="error"] {
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
+
+.wiki-nav-status-text {
+  flex: 1 1 auto;
+}
+
+.wiki-nav-publish {
+  min-height: 32px;
+  padding: 0 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--tertiary);
+  background: transparent;
+  color: var(--tertiary);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.wiki-nav-status[data-kind="busy"] .wiki-nav-publish,
+.wiki-nav-status[data-kind="ok"] .wiki-nav-publish {
+  display: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  li.drag-ghost {
+    transform: none;
+  }
+  .wiki-nav .drag-grip {
+    transition: none;
+  }
+}

@@ -1,0 +1,63 @@
+/*
+ * Per-page tag chips in the right sidebar.
+ *
+ * Uses the site's own theme variables rather than the standalone surface tokens,
+ * because unlike /admin and /browse this component lives inside the rendered site
+ * and must inherit whatever the liquid-glass theme is currently doing.
+ */
+
+.wiki-tags {
+  h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+  }
+
+  ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin: 0 0 0.5rem;
+    padding: 0;
+  }
+
+  li {
+    margin: 0;
+  }
+}
+
+.wiki-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  /* Comfortably tappable without making the sidebar feel chunky. */
+  min-height: 30px;
+  padding: 0 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--darkgray);
+  font-family: var(--headerFont);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.wiki-tag-chip:hover {
+  border-color: var(--tertiary);
+  color: var(--tertiary);
+}
+
+.wiki-tags-all {
+  font-size: 0.76rem;
+  color: var(--gray);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.wiki-tags-all:hover {
+  color: var(--tertiary);
+  border-bottom-color: var(--tertiary);
+}

@@ -1,0 +1,675 @@
+/*
+ * Deyotlan admin
+ *
+ * Self-contained styles for the /admin surface. Deliberately NOT @use'd from
+ * custom.scss: the admin is a separate application, not a content page, and keeping
+ * the two stylesheets disjoint means site CSS can never leak into the admin and
+ * admin CSS can never leak into the site.
+ *
+ * Design tokens come from _surface-tokens.scss, shared with /browse.
+ *
+ * Mobile-first throughout: the primary use is a phone at the games table.
+ */
+
+@use "./surface-tokens";
+
+body {
+  min-height: 100dvh;
+  background-color: var(--surface-base);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 15% -10%, rgba(183, 58, 47, 0.18), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 95% 5%, rgba(214, 168, 75, 0.1), transparent 55%);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: var(--bodyFont);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  /* iOS safe areas: the topbar and the sticky action bar both sit against an edge. */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Layout                                                                     */
+/* -------------------------------------------------------------------------- */
+
+.admin-shell {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 1rem 1rem 5rem;
+}
+
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1.25rem;
+  border-radius: var(--glass-radius);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill-strong);
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  box-shadow: 0 10px 30px -18px var(--glass-shadow);
+}
+
+.admin-brand {
+  font-family: var(--headerFont);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.admin-brand .admin-brand-sub {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--text-faint);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-topbar-spacer {
+  flex: 1 1 auto;
+}
+
+.admin-nav {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.admin-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.95rem;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill-soft);
+  color: var(--text-dim);
+  text-decoration: none;
+  font-family: var(--headerFont);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition:
+    color 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease;
+}
+
+.admin-nav a:hover,
+.admin-nav a:focus-visible {
+  color: var(--text);
+  border-color: color-mix(in oklab, var(--accent-secondary) 55%, transparent);
+}
+
+.admin-nav a[aria-current="page"] {
+  color: var(--surface-base);
+  background: var(--accent-secondary);
+  border-color: var(--accent-secondary);
+}
+
+:root[data-theme="light"] .admin-nav a[aria-current="page"] {
+  color: #2b2320;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Panels                                                                     */
+/* -------------------------------------------------------------------------- */
+
+.admin-panel {
+  border-radius: var(--glass-radius);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill);
+  backdrop-filter: blur(var(--glass-blur)) saturate(135%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(135%);
+  box-shadow: 0 16px 40px -26px var(--glass-shadow);
+  padding: 1.15rem;
+  margin-bottom: 1rem;
+}
+
+.admin-panel > h2 {
+  font-family: var(--headerFont);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.85rem;
+  letter-spacing: 0.01em;
+}
+
+.admin-panel > h2 .admin-count {
+  color: var(--text-faint);
+  font-weight: 400;
+  font-size: 0.85rem;
+  margin-left: 0.4rem;
+}
+
+.admin-hint {
+  color: var(--text-faint);
+  font-size: 0.86rem;
+  margin: 0.4rem 0 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Forms                                                                      */
+/* -------------------------------------------------------------------------- */
+
+.admin-field {
+  display: block;
+  margin-bottom: 0.9rem;
+}
+
+.admin-field > span {
+  display: block;
+  font-family: var(--headerFont);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.35rem;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="search"],
+select,
+textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill-soft);
+  color: var(--text);
+  font-family: var(--bodyFont);
+  font-size: 1rem; /* >=16px stops iOS Safari zooming the viewport on focus */
+  line-height: 1.5;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+textarea {
+  resize: vertical;
+  font-family: var(--codeFont);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-color: color-mix(in oklab, var(--accent-secondary) 70%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent-secondary) 22%, transparent);
+}
+
+button {
+  font-family: var(--headerFont);
+  font-size: 0.95rem;
+  font-weight: 600;
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill-soft);
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    transform 0.08s ease;
+}
+
+button:hover:not(:disabled) {
+  border-color: color-mix(in oklab, var(--accent-secondary) 55%, transparent);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+button.primary {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--accent-primary) 92%, white 8%),
+    var(--accent-primary)
+  );
+  border-color: color-mix(in oklab, var(--accent-primary) 70%, black 30%);
+  color: #fff6ef;
+  box-shadow: 0 8px 22px -12px var(--accent-glow);
+}
+
+button.primary:hover:not(:disabled) {
+  border-color: var(--accent-secondary);
+}
+
+button.big {
+  width: 100%;
+  min-height: 54px;
+  font-size: 1.05rem;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Login                                                                      */
+/* -------------------------------------------------------------------------- */
+
+.admin-login {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.admin-login .admin-panel {
+  width: 100%;
+  max-width: 380px;
+  margin: 0;
+}
+
+.admin-login h1 {
+  font-family: var(--headerFont);
+  font-size: 1.3rem;
+  margin: 0 0 0.25rem;
+}
+
+.admin-login .admin-hint {
+  margin-bottom: 1.1rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Page list                                                                  */
+/* -------------------------------------------------------------------------- */
+
+.admin-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.admin-list li {
+  border-radius: 12px;
+  border: 1px solid transparent;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.admin-list li:hover {
+  background: var(--glass-fill-soft);
+  border-color: var(--glass-border);
+}
+
+.admin-list a {
+  display: block;
+  padding: 0.6rem 0.75rem;
+  color: inherit;
+  text-decoration: none;
+  min-height: 44px;
+}
+
+.admin-list .admin-item-title {
+  display: block;
+  font-family: var(--headerFont);
+  font-weight: 600;
+  font-size: 0.97rem;
+  color: var(--text);
+}
+
+.admin-list .admin-item-path {
+  display: block;
+  font-family: var(--codeFont);
+  font-size: 0.74rem;
+  color: var(--text-faint);
+  margin-top: 0.15rem;
+  word-break: break-all;
+}
+
+.admin-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.35rem;
+}
+
+.admin-tag {
+  font-size: 0.72rem;
+  font-family: var(--headerFont);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--accent-secondary) 34%, transparent);
+  color: var(--accent-secondary);
+  background: color-mix(in oklab, var(--accent-secondary) 10%, transparent);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Checkbox + file input                                                      */
+/* -------------------------------------------------------------------------- */
+
+.admin-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  cursor: pointer;
+}
+
+.admin-checkbox input[type="checkbox"] {
+  /* 20px visual box, but the label makes the whole row a >=44px target. */
+  width: 20px;
+  height: 20px;
+  min-height: 0;
+  margin: 0.15rem 0 0;
+  flex: 0 0 auto;
+  accent-color: var(--accent-primary);
+  cursor: pointer;
+}
+
+.admin-checkbox > span {
+  display: block;
+  font-family: var(--bodyFont);
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--text-dim);
+  margin: 0;
+  padding: 0.1rem 0;
+}
+
+.admin-file-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border-radius: 12px;
+  border: 1px dashed var(--glass-border);
+  background: var(--glass-fill-soft);
+  color: var(--text);
+  font-family: var(--headerFont);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.18s ease;
+}
+
+.admin-file-button:hover,
+.admin-file-button:focus-within {
+  border-color: color-mix(in oklab, var(--accent-secondary) 60%, transparent);
+}
+
+.admin-file-button input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  cursor: pointer;
+}
+
+.admin-save-status {
+  margin-top: 0.75rem;
+}
+
+.admin-save-status .admin-hint a {
+  color: var(--accent-secondary);
+}
+
+code {
+  font-family: var(--codeFont);
+  font-size: 0.86em;
+  padding: 0.05rem 0.3rem;
+  border-radius: 5px;
+  background: var(--glass-fill-soft);
+  border: 1px solid var(--glass-border);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Quick-add session notes                                                    */
+/* -------------------------------------------------------------------------- */
+
+.admin-nav a.admin-nav-primary {
+  border-color: color-mix(in oklab, var(--accent-primary) 55%, transparent);
+  color: var(--text);
+}
+
+.admin-nav a.admin-nav-primary[aria-current="page"] {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: #fff6ef;
+}
+
+.quick-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.85rem;
+}
+
+.quick-head h2 {
+  margin: 0;
+  font-family: var(--headerFont);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.quick-badge {
+  margin-left: auto;
+  font-family: var(--headerFont);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--accent-secondary) 40%, transparent);
+  color: var(--accent-secondary);
+  background: color-mix(in oklab, var(--accent-secondary) 10%, transparent);
+  white-space: nowrap;
+}
+
+.quick-badge[data-mode="append"] {
+  border-color: color-mix(in oklab, var(--ok) 45%, transparent);
+  color: var(--ok);
+  background: color-mix(in oklab, var(--ok) 10%, transparent);
+}
+
+.quick-textarea {
+  min-height: 220px;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.admin-panel-quick {
+  margin-bottom: 0.75rem;
+}
+
+.admin-details {
+  padding: 0;
+  margin-bottom: 0.75rem;
+}
+
+.admin-details > summary {
+  padding: 0.9rem 1.15rem;
+  cursor: pointer;
+  font-family: var(--headerFont);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  list-style: none;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.admin-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.admin-details > summary::before {
+  content: "B8";
+  margin-right: 0.5rem;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.admin-details[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.admin-details-body {
+  padding: 0 1.15rem 1.15rem;
+}
+
+.admin-banner-draft {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.admin-linkish {
+  background: none;
+  border: none;
+  padding: 0;
+  min-height: 0;
+  color: var(--accent-secondary);
+  text-decoration: underline;
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+
+/*
+ * The save button sits against the bottom edge so it stays reachable with one thumb
+ * while the textarea grows. `position: sticky` keeps it in the flow, so it never
+ * covers the end of the notes.
+ */
+.quick-actions {
+  position: sticky;
+  bottom: 0;
+  padding: 0.85rem 0 calc(0.85rem + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--surface-base) 62%, transparent);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Status + messages                                                          */
+/* -------------------------------------------------------------------------- */
+
+.admin-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  min-height: 1.4rem;
+}
+
+.admin-status[data-kind="error"] {
+  color: var(--err);
+}
+
+.admin-status[data-kind="ok"] {
+  color: var(--ok);
+}
+
+.admin-status[data-kind="busy"] {
+  color: var(--warn);
+}
+
+.admin-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in oklab, currentColor 30%, transparent);
+  border-top-color: currentColor;
+  animation: admin-spin 0.7s linear infinite;
+  flex: 0 0 auto;
+}
+
+@keyframes admin-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-spinner {
+    animation-duration: 2.4s;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.admin-empty {
+  color: var(--text-faint);
+  font-style: italic;
+  padding: 0.5rem 0;
+}
+
+.admin-banner {
+  border-radius: 12px;
+  border: 1px solid color-mix(in oklab, var(--warn) 40%, transparent);
+  background: color-mix(in oklab, var(--warn) 10%, transparent);
+  color: var(--text);
+  padding: 0.6rem 0.8rem;
+  font-size: 0.86rem;
+  margin-bottom: 1rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Utility                                                                    */
+/* -------------------------------------------------------------------------- */
+
+.admin-icon-button {
+  min-width: 44px;
+  padding: 0 0.7rem;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (min-width: 640px) {
+  .admin-shell {
+    padding: 1.5rem 1.5rem 5rem;
+  }
+
+  .admin-panel {
+    padding: 1.4rem 1.5rem;
+  }
+}

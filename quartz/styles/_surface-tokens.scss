@@ -1,0 +1,63 @@
+/*
+ * Shared design tokens for the standalone surfaces (/admin and /browse).
+ *
+ * These mirror deyotlan-glass.scss -- obsidian / cinnabar / antique gold -- so every
+ * surface reads as one product. They are redeclared rather than imported from the
+ * site stylesheet so a standalone page still renders correctly if the site CSS is
+ * absent, and factored into this partial so the two surfaces cannot drift apart.
+ */
+
+:root {
+  --accent-primary: #b73a2f;
+  --accent-secondary: #d6a84b;
+  --accent-soft: #7f241f;
+  --accent-glow: rgba(183, 58, 47, 0.32);
+
+  --surface-base: #0b090b;
+  --surface-deep: #120d10;
+  --glass-fill: rgba(18, 14, 17, 0.58);
+  --glass-fill-strong: rgba(20, 15, 18, 0.76);
+  --glass-fill-soft: rgba(255, 255, 255, 0.035);
+  --glass-border: rgba(255, 231, 193, 0.12);
+  --glass-highlight: rgba(255, 244, 219, 0.18);
+  --glass-shadow: rgba(0, 0, 0, 0.48);
+  --glass-radius: 22px;
+  --glass-blur: 24px;
+
+  --text: #f2e9df;
+  --text-dim: #d9d0cd;
+  --text-faint: #75666b;
+
+  --ok: #6fae72;
+  --warn: #d7ad56;
+  --err: #d4584a;
+
+  --headerFont: "Schibsted Grotesk", "Segoe UI", system-ui, sans-serif;
+  --bodyFont: "Source Sans Pro", "Segoe UI", system-ui, sans-serif;
+  --codeFont: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+:root[data-theme="light"] {
+  --surface-base: #eee7df;
+  --surface-deep: #e1d5ca;
+  --glass-fill: rgba(252, 248, 244, 0.58);
+  --glass-fill-strong: rgba(251, 247, 242, 0.88);
+  --glass-fill-soft: rgba(20, 15, 18, 0.03);
+  --glass-border: rgba(60, 40, 30, 0.16);
+  --glass-highlight: rgba(255, 255, 255, 0.7);
+  --glass-shadow: rgba(80, 55, 40, 0.18);
+
+  --text: #2b2320;
+  --text-dim: #4e4340;
+  --text-faint: #8a7a72;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}

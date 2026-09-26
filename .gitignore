@@ -12,3 +12,7 @@ replit.nix
 .quartz/
 quartz/cli/tui/dist/
 .turbo/
+
+# DEYOTLAN: local admin secrets, never committed
+.env.local
+.env*.local

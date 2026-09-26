@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-25T00:00:00.000Z",
+  "groups": [
+    {
+      "id": "g-campaign",
+      "label": "Five Banners Burning",
+      "collapsed": false,
+      "autoSort": "title",
+      "items": [{ "slug": "five-banners-burning-campaign/index", "label": "Campaign index" }]
+    },
+    {
+      "id": "g-world",
+      "label": "The World",
+      "collapsed": false,
+      "folderHints": ["five-banners-burning-campaign/deyonahua"],
+      "autoSort": "title",
+      "items": [
+        { "slug": "five-banners-burning-campaign/deyonahua/index", "label": "Deyonahua" },
+        { "slug": "five-banners-burning-campaign/deyonahua/deyotlan" },
+        {
+          "slug": "five-banners-burning-campaign/deyonahua/deynalli_names_and_meanings",
+          "label": "Deynalli Names and Meanings"
+        },
+        { "slug": "five-banners-burning-campaign/deyonahua/quizgode", "label": "Teotlac" }
+      ]
+    },
+    {
+      "id": "g-characters",
+      "label": "Player Characters",
+      "collapsed": false,
+      "folderHints": ["five-banners-burning-campaign/pc-info"],
+      "autoSort": "title",
+      "items": [
+        {
+          "slug": "five-banners-burning-campaign/pc-info/arianrhod----the-apprentice-seer",
+          "label": "Arianrhod — The Apprentice Seer"
+        }
+      ]
+    },
+    {
+      "id": "g-sessions",
+      "label": "Session Notes",
+      "collapsed": false,
+      "folderHints": ["five-banners-burning-campaign/session-notes"],
+      "autoSort": "date-desc",
+      "items": []
+    }
+  ],
+  "hidden": [
+    "index",
+    "five-banners-burning-campaign/pc-info/index",
+    "five-banners-burning-campaign/session-notes/index"
+  ],
+  "fallbackGroupLabel": "Unfiled"
+}
